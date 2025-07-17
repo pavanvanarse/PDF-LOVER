@@ -1,1068 +1,423 @@
-/* CSS Variables */
-:root {
-    --primary-color: #2563eb;
-    --primary-dark: #1d4ed8;
-    --primary-light: #3b82f6;
-    --secondary-color: #f8fafc;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --text-muted: #94a3b8;
-    --border-color: #e2e8f0;
-    --border-light: #f1f5f9;
-    --success-color: #059669;
-    --warning-color: #d97706;
-    --error-color: #dc2626;
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --border-radius: 12px;
-    --border-radius-sm: 6px;
-    --border-radius-lg: 16px;
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-/* Reset and Base Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    font-family: var(--font-family);
-    line-height: 1.6;
-    color: var(--text-primary);
-    background: var(--secondary-color);
-    overflow-x: hidden;
-}
-
-/* Typography */
-h1, h2, h3, h4, h5, h6 {
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 0.5rem;
-}
-
-h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
-h2 { font-size: clamp(1.5rem, 4vw, 2.5rem); }
-h3 { font-size: clamp(1.25rem, 3vw, 1.875rem); }
-h4 { font-size: 1.25rem; }
-
-p {
-    margin-bottom: 1rem;
-    color: var(--text-secondary);
-}
-
-a {
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: var(--transition);
-}
-
-a:hover {
-    color: var(--primary-dark);
-}
-
-/* Navigation */
-.navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border-light);
-    z-index: 1000;
-    padding: 0;
-}
-
-.nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 2rem;
-    gap: 2rem;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-.logo-icon {
-    font-size: 2rem;
-}
-
-.nav-search {
-    position: relative;
-    flex: 1;
-    max-width: 400px;
-}
-
-.search-input {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 3rem;
-    border: 2px solid var(--border-color);
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    background: white;
-    transition: var(--transition);
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
-}
-
-.search-icon {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-}
-
-.nav-toggle {
-    display: none;
-    flex-direction: column;
-    background: none;
-    border: none;
-    padding: 0.5rem;
-    cursor: pointer;
-    gap: 4px;
-}
-
-.nav-toggle span {
-    width: 25px;
-    height: 2px;
-    background: var(--text-primary);
-    transition: var(--transition);
-}
-
-/* Main Content */
-.main-content {
-    margin-top: 80px;
-    min-height: calc(100vh - 80px);
-}
-
-/* Hero Section */
-.hero {
-    background: var(--gradient-primary);
-    padding: 4rem 2rem;
-    text-align: center;
-    color: white;
-}
-
-.hero-content {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.hero-title {
-    margin-bottom: 1.5rem;
-    text-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
-}
-
-.hero-description {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-    opacity: 0.9;
-}
-
-.hero-features {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
-.feature-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: var(--border-radius);
-    backdrop-filter: blur(10px);
-}
-
-.feature-icon {
-    font-size: 1.25rem;
-}
-
-/* Category Navigation */
-.category-nav {
-    background: white;
-    padding: 2rem;
-    box-shadow: var(--shadow-sm);
-    position: sticky;
-    top: 80px;
-    z-index: 100;
-}
-
-.category-tabs {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.category-tab {
-    padding: 0.75rem 1.5rem;
-    border: 2px solid var(--border-color);
-    border-radius: var(--border-radius);
-    background: white;
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: var(--transition);
-    font-weight: 500;
-    font-size: 0.95rem;
-}
-
-.category-tab:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    transform: translateY(-1px);
-}
-
-.category-tab.active {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-    color: white;
-    box-shadow: var(--shadow-md);
-}
-
-/* Tools Container */
-.tools-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-}
-
-.tools-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
-}
-
-/* Tool Card */
-.tool-card {
-    background: white;
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-    transition: var(--transition);
-    border: 1px solid var(--border-light);
-}
-
-.tool-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-}
-
-.tool-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--border-light);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.tool-icon {
-    font-size: 2rem;
-    width: 3rem;
-    height: 3rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--secondary-color);
-    border-radius: var(--border-radius);
-}
-
-.tool-info {
-    flex: 1;
-}
-
-.tool-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    color: var(--text-primary);
-}
-
-.tool-description {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin: 0;
-}
-
-.tool-toggle {
-    font-size: 1.5rem;
-    color: var(--text-muted);
-    transition: var(--transition);
-}
-
-.tool-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-}
-
-.tool-content.expanded {
-    max-height: 1000px;
-}
-
-.tool-body {
-    padding: 2rem;
-}
-
-/* Form Elements */
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: var(--text-primary);
-}
-
-.file-input-wrapper {
-    position: relative;
-    width: 100%;
-}
-
-.file-input {
-    position: absolute;
-    opacity: 0;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-}
-
-.file-drop-zone {
-    border: 2px dashed var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    text-align: center;
-    background: var(--secondary-color);
-    transition: var(--transition);
-    cursor: pointer;
-    min-height: 120px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-
-.file-drop-zone:hover,
-.file-drop-zone.dragover {
-    border-color: var(--primary-color);
-    background: rgb(37 99 235 / 0.05);
-    color: var(--primary-color);
-}
-
-.drop-icon {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-
-.drop-text {
-    font-weight: 500;
-    margin: 0;
-}
-
-.drop-subtext {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin: 0;
-}
-
-/* Input Styles */
-input[type="text"],
-input[type="number"],
-input[type="email"],
-input[type="password"],
-select,
-textarea {
-    width: 100%;
-    padding: 0.75rem;
-    border: 2px solid var(--border-color);
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    background: white;
-    transition: var(--transition);
-}
-
-input[type="text"]:focus,
-input[type="number"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus,
-select:focus,
-textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
-}
-
-input[type="range"] {
-    width: 100%;
-    height: 6px;
-    background: var(--border-color);
-    border-radius: 3px;
-    outline: none;
-    appearance: none;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    background: var(--primary-color);
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-input[type="color"] {
-    width: 60px;
-    height: 40px;
-    border: none;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-}
-
-/* Buttons */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition);
-    text-decoration: none;
-    min-height: 44px;
-}
-
-.btn-primary {
-    background: var(--primary-color);
-    color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-    background: var(--primary-dark);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-}
-
-.btn-secondary {
-    background: var(--secondary-color);
-    color: var(--text-primary);
-    border: 2px solid var(--border-color);
-}
-
-.btn-secondary:hover:not(:disabled) {
-    background: var(--border-light);
-    border-color: var(--primary-color);
-}
-
-.btn-success {
-    background: var(--success-color);
-    color: white;
-}
-
-.btn-warning {
-    background: var(--warning-color);
-    color: white;
-}
-
-.btn-danger {
-    background: var(--error-color);
-    color: white;
-}
-
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.btn-loading {
-    pointer-events: none;
-}
-
-/* Progress Bars */
-.progress-container {
-    margin: 1rem 0;
-    display: none;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 8px;
-    background: var(--border-color);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background: var(--primary-color);
-    border-radius: 4px;
-    transition: width 0.3s ease;
-    width: 0%;
-}
-
-.progress-text {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    text-align: center;
-    margin-top: 0.5rem;
-}
-
-/* Loading Spinner */
-.spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: currentColor;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    backdrop-filter: blur(2px);
-}
-
-.loading-overlay.show {
-    display: flex;
-}
-
-.loading-spinner {
-    width: 60px;
-    height: 60px;
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: white;
-    animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
-}
-
-.loading-text {
-    color: white;
-    font-size: 1.1rem;
-    font-weight: 500;
-}
-
-/* Result Areas */
-.result-area {
-    margin-top: 1.5rem;
-    padding: 1.5rem;
-    background: var(--secondary-color);
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-light);
-    display: none;
-}
-
-.result-area.show {
-    display: block;
-    animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Alerts */
-.alert {
-    padding: 1rem 1.5rem;
-    border-radius: var(--border-radius);
-    margin: 1rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    border: 1px solid;
-}
-
-.alert-success {
-    background: rgb(5 150 105 / 0.1);
-    border-color: rgb(5 150 105 / 0.3);
-    color: #065f46;
-}
-
-.alert-error {
-    background: rgb(220 38 38 / 0.1);
-    border-color: rgb(220 38 38 / 0.3);
-    color: #991b1b;
-}
-
-.alert-warning {
-    background: rgb(217 119 6 / 0.1);
-    border-color: rgb(217 119 6 / 0.3);
-    color: #92400e;
-}
-
-.alert-info {
-    background: rgb(37 99 235 / 0.1);
-    border-color: rgb(37 99 235 / 0.3);
-    color: #1e3a8a;
-}
-
-/* PDF Viewer */
-.pdf-viewer {
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    max-height: 500px;
-    overflow-y: auto;
-    background: #f8f9fa;
-}
-
-.pdf-page {
-    margin: 1rem;
-    text-align: center;
-    background: white;
-    border-radius: var(--border-radius-sm);
-    padding: 1rem;
-    box-shadow: var(--shadow-sm);
-}
-
-.pdf-page canvas {
-    max-width: 100%;
-    height: auto;
-    border-radius: var(--border-radius-sm);
-}
-
-/* Page Controls */
-.page-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin: 1rem 0;
-    justify-content: center;
-}
-
-.page-item {
-    position: relative;
-    border: 2px solid var(--border-color);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    cursor: pointer;
-    transition: var(--transition);
-    background: white;
-    width: 120px;
-    height: 160px;
-}
-
-.page-item:hover {
-    border-color: var(--primary-color);
-    transform: scale(1.02);
-}
-
-.page-item.selected {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgb(37 99 235 / 0.3);
-}
-
-.page-item img,
-.page-item canvas {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.page-number {
-    position: absolute;
-    bottom: 0.5rem;
-    right: 0.5rem;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--border-radius-sm);
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-/* Drag and Drop */
-.sortable-ghost {
-    opacity: 0.5;
-}
-
-.sortable-drag {
-    transform: rotate(5deg);
-}
-
-/* Tables */
-.table-container {
-    overflow-x: auto;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
-    margin: 1rem 0;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-}
-
-th, td {
-    padding: 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border-light);
-}
-
-th {
-    background: var(--secondary-color);
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-tbody tr:hover {
-    background: rgb(37 99 235 / 0.05);
-}
-
-/* Canvas Container */
-.canvas-container {
-    position: relative;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    background: white;
-    margin: 1rem 0;
-}
-
-.canvas-toolbar {
-    padding: 1rem;
-    background: var(--secondary-color);
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: center;
-}
-
-.tool-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-/* Stats Section */
-.stats {
-    background: white;
-    padding: 4rem 2rem;
-    margin-top: 4rem;
-}
-
-.stats-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2rem;
-    text-align: center;
-}
-
-.stat-item {
-    padding: 2rem;
-    border-radius: var(--border-radius-lg);
-    background: var(--gradient-primary);
-    color: white;
-    box-shadow: var(--shadow-md);
-}
-
-.stat-number {
-    display: block;
-    font-size: 3rem;
-    font-weight: 800;
-    margin-bottom: 0.5rem;
-}
-
-.stat-label {
-    font-size: 1.1rem;
-    opacity: 0.9;
-}
-
-/* Footer */
-.footer {
-    background: var(--text-primary);
-    color: white;
-    padding: 4rem 2rem 2rem;
-}
-
-.footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-}
-
-.footer-section h3,
-.footer-section h4 {
-    margin-bottom: 1rem;
-    color: white;
-}
-
-.footer-section ul {
-    list-style: none;
-}
-
-.footer-section ul li {
-    margin-bottom: 0.5rem;
-}
-
-.footer-section a {
-    color: rgba(255, 255, 255, 0.8);
-    transition: var(--transition);
-}
-
-.footer-section a:hover {
-    color: white;
-}
-
-.footer-bottom {
-    max-width: 1200px;
-    margin: 2rem auto 0;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    text-align: center;
-    color: rgba(255, 255, 255, 0.8);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .nav-container {
-        padding: 1rem;
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All PDF Tools – Free Online PDF Editor, Converter & Viewer</title>
+    <meta name="description" content="Access 65+ browser-based PDF tools: merge, compress, convert, OCR, fill forms and more. 100% free and works on any device.">
+    <meta name="keywords" content="PDF tools, PDF converter, PDF merger, PDF editor, free online PDF, PDF compressor">
+    <meta name="author" content="PDF Tools">
     
-    .nav-search {
-        order: 3;
-        width: 100%;
-    }
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourpdftools.com/">
+    <meta property="og:title" content="All PDF Tools – Free Online PDF Editor, Converter & Viewer">
+    <meta property="og:description" content="Access 65+ browser-based PDF tools: merge, compress, convert, OCR, fill forms and more. 100% free and works on any device.">
     
-    .nav-toggle {
-        display: flex;
-        order: 2;
-    }
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://yourpdftools.com/">
+    <meta property="twitter:title" content="All PDF Tools – Free Online PDF Editor, Converter & Viewer">
+    <meta property="twitter:description" content="Access 65+ browser-based PDF tools: merge, compress, convert, OCR, fill forms and more. 100% free and works on any device.">
     
-    .hero {
-        padding: 3rem 1rem;
-    }
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     
-    .hero-features {
-        gap: 1rem;
-    }
-    
-    .category-nav {
-        padding: 1rem;
-    }
-    
-    .category-tabs {
-        gap: 0.5rem;
-    }
-    
-    .category-tab {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-    }
-    
-    .tools-container {
-        padding: 1rem;
-    }
-    
-    .tools-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .tool-header {
-        padding: 1rem;
-    }
-    
-    .tool-body {
-        padding: 1rem;
-    }
-    
-    .canvas-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .page-controls {
-        justify-content: center;
-    }
-    
-    .page-item {
-        width: 100px;
-        height: 140px;
-    }
-    
-    .stats-container {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .stat-item {
-        padding: 1.5rem;
-    }
-    
-    .footer-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        text-align: center;
-    }
-}
+    <style>
+        /* ========== GLOBAL RESET ========== */
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
 
-@media (max-width: 480px) {
-    .hero-features {
-        flex-direction: column;
-    }
-    
-    .btn {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .page-item {
-        width: 80px;
-        height: 112px;
-    }
-    
-    .stat-number {
-        font-size: 2.5rem;
-    }
-}
+        body {
+          font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+          background-color: #f9f9f9;
+          color: #333;
+          line-height: 1.6;
+          scroll-behavior: smooth;
+        }
 
-/* Accessibility */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-}
+        a {
+          text-decoration: none;
+          color: inherit;
+        }
 
-@media (prefers-contrast: high) {
-    :root {
-        --primary-color: #0000ff;
-        --text-primary: #000000;
-        --border-color: #000000;
-    }
-}
+        .container {
+          max-width: 1200px;
+          margin: auto;
+          padding: 2rem 1rem;
+        }
 
-/* Print Styles */
-@media print {
-    .navbar,
-    .footer,
-    .category-nav {
-        display: none;
-    }
-    
-    .main-content {
-        margin-top: 0;
-    }
-    
-    .tool-card {
-        break-inside: avoid;
-        box-shadow: none;
-        border: 1px solid #000;
-    }
-}
+        /* ========== HEADER ========== */
+        header {
+          background-color: #ffffff;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+          padding: 1.5rem 0;
+          text-align: center;
+          border-bottom: 1px solid #eee;
+        }
 
-/* Focus Styles */
-*:focus {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
-}
+        header h1 {
+          font-size: 2rem;
+          color: #222;
+          margin-bottom: 0.5rem;
+        }
 
-button:focus,
-input:focus,
-select:focus,
-textarea:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgb(37 99 235 / 0.3);
-}
+        header p {
+          font-size: 1rem;
+          color: #666;
+        }
 
-/* Utility Classes */
-.hidden { display: none; }
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
+        /* ========== SEARCH BAR ========== */
+        .search-box {
+          margin: 2rem auto;
+          max-width: 500px;
+          position: relative;
+        }
 
-.text-center { text-align: center; }
-.text-left { text-align: left; }
-.text-right { text-align: right; }
+        .search-box input {
+          width: 100%;
+          padding: 0.8rem 1rem;
+          border-radius: 8px;
+          border: 1px solid #ccc;
+          font-size: 1rem;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+          outline: none;
+          transition: border-color 0.2s ease-in-out;
+        }
 
-.mb-0 { margin-bottom: 0; }
-.mb-1 { margin-bottom: 0.5rem; }
-.mb-2 { margin-bottom: 1rem; }
-.mb-3 { margin-bottom: 1.5rem; }
-.mb-4 { margin-bottom: 2rem; }
+        .search-box input:focus {
+          border-color: #0077ff;
+        }
 
-.mt-0 { margin-top: 0; }
-.mt-1 { margin-top: 0.5rem; }
-.mt-2 { margin-top: 1rem; }
-.mt-3 { margin-top: 1.5rem; }
-.mt-4 { margin-top: 2rem; }
+        /* ========== TOOL GRID ========== */
+        .tools-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 1.5rem;
+          padding-bottom: 2rem;
+        }
 
-.p-0 { padding: 0; }
-.p-1 { padding: 0.5rem; }
-.p-2 { padding: 1rem; }
-.p-3 { padding: 1.5rem; }
-.p-4 { padding: 2rem; }
+        .tool-card {
+          background-color: #fff;
+          padding: 1.5rem;
+          border-radius: 16px;
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          height: 100%;
+          position: relative;
+        }
+
+        .tool-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-card h2 {
+          font-size: 1.1rem;
+          color: #111;
+          margin-bottom: 0.5rem;
+        }
+
+        .tool-card p {
+          font-size: 0.9rem;
+          color: #555;
+          flex-grow: 1;
+          margin-bottom: 1rem;
+        }
+
+        .tool-card .open-link {
+          margin-top: auto;
+          color: #0077ff;
+          font-weight: bold;
+          font-size: 0.9rem;
+          transition: color 0.2s ease-in-out;
+        }
+
+        .tool-card .open-link:hover {
+          color: #0056cc;
+          text-decoration: underline;
+        }
+
+        /* ========== FOOTER ========== */
+        footer {
+          text-align: center;
+          padding: 1rem;
+          color: #888;
+          font-size: 0.9rem;
+          border-top: 1px solid #eee;
+          background-color: #fff;
+        }
+
+        /* ========== ADDITIONAL STYLES ========== */
+        .results-count {
+          text-align: center;
+          margin-bottom: 1.5rem;
+          color: #666;
+          font-size: 0.9rem;
+        }
+
+        .no-results {
+          text-align: center;
+          padding: 3rem 1rem;
+          color: #666;
+          display: none;
+        }
+
+        .no-results h3 {
+          margin-bottom: 0.5rem;
+          color: #444;
+        }
+
+        /* ========== MEDIA QUERIES ========== */
+        @media (max-width: 768px) {
+          .tool-card {
+            padding: 1.2rem;
+          }
+
+          header h1 {
+            font-size: 1.5rem;
+          }
+
+          .search-box input {
+            font-size: 0.95rem;
+          }
+        }
+
+        /* ========== ACCESSIBILITY ========== */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* ========== LOADING STATE ========== */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>65+ Free PDF Tools</h1>
+        <p>Right in Your Browser – No Downloads Required</p>
+    </header>
+
+    <div class="container">
+        <div class="search-box">
+            <input 
+                type="text" 
+                id="searchInput"
+                placeholder="Search PDF tools..." 
+                aria-label="Search PDF tools"
+                autocomplete="off"
+            >
+        </div>
+
+        <div class="results-count" id="resultsCount">
+            65 tools available
+        </div>
+
+        <div class="tools-grid" id="toolsGrid">
+            <!-- Tool cards will be populated by JavaScript -->
+        </div>
+
+        <div class="no-results" id="noResults">
+            <h3>No tools found</h3>
+            <p>Try adjusting your search terms or browse all available tools.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 PDF Tools. All rights reserved. | <a href="/privacy" style="color: #0077ff;">Privacy Policy</a> | <a href="/terms" style="color: #0077ff;">Terms of Service</a></p>
+    </footer>
+
+    <script>
+        // PDF Tools Data
+        const pdfTools = [
+            { name: "PDF Merger", description: "Combine multiple PDF files into one document", slug: "pdf-merger" },
+            { name: "PDF Splitter", description: "Split PDF into separate pages or sections", slug: "pdf-splitter" },
+            { name: "PDF Compressor", description: "Reduce PDF file size while maintaining quality", slug: "pdf-compressor" },
+            { name: "PDF to Image", description: "Convert PDF pages to JPG, PNG or other image formats", slug: "pdf-to-image" },
+            { name: "Image to PDF", description: "Turn images into a single PDF document", slug: "image-to-pdf" },
+            { name: "PDF Unlocker", description: "Remove passwords and restrictions from PDF files", slug: "pdf-unlocker" },
+            { name: "PDF Text Extractor", description: "Extract all text content from PDF documents", slug: "pdf-text-extractor" },
+            { name: "PDF to Text", description: "Save PDF content as a plain text file", slug: "pdf-to-text" },
+            { name: "Rearrange PDF Pages", description: "Reorder and organize PDF pages", slug: "rearrange-pages" },
+            { name: "PDF Watermark Adder", description: "Add custom watermarks to PDF pages", slug: "pdf-watermark" },
+            { name: "PDF Annotator", description: "Draw, highlight and add notes to PDF", slug: "pdf-annotator" },
+            { name: "Add Page Numbers", description: "Insert page numbering to PDF documents", slug: "add-page-numbers" },
+            { name: "Remove PDF Borders", description: "Trim white space and margins from PDF", slug: "remove-borders" },
+            { name: "Live PDF Viewer", description: "Preview PDF with scrollable interface", slug: "live-pdf-viewer" },
+            { name: "PDF Signature", description: "Add digital signatures to PDF documents", slug: "pdf-signature" },
+            { name: "PDF to Excel", description: "Convert PDF tables to Excel spreadsheets", slug: "pdf-to-excel" },
+            { name: "Excel to PDF", description: "Convert Excel files to PDF format", slug: "excel-to-pdf" },
+            { name: "PDF to Word", description: "Convert PDF documents to editable Word files", slug: "pdf-to-word" },
+            { name: "Word to PDF", description: "Convert Word documents to PDF format", slug: "word-to-pdf" },
+            { name: "Delete PDF Pages", description: "Remove specific pages from PDF documents", slug: "delete-pages" },
+            { name: "Duplicate PDF Pages", description: "Copy and duplicate pages within PDF", slug: "duplicate-pages" },
+            { name: "Rotate PDF Pages", description: "Rotate pages to correct orientation", slug: "rotate-pages" },
+            { name: "Drag & Drop Merger", description: "Merge PDFs using intuitive drag interface", slug: "drag-drop-merger" },
+            { name: "Compare PDFs", description: "Find and highlight differences between PDFs", slug: "compare-pdfs" },
+            { name: "Redact Text", description: "Permanently remove sensitive information", slug: "redact-pdf" },
+            { name: "Fill PDF Forms", description: "Fill out and save PDF form data", slug: "fill-forms" },
+            { name: "Extract Images", description: "Save all embedded images from PDF", slug: "extract-images" },
+            { name: "Background Remover", description: "Remove backgrounds from PDF pages", slug: "background-remover" },
+            { name: "PDF to CSV", description: "Convert PDF data tables to CSV format", slug: "pdf-to-csv" },
+            { name: "CSV to PDF", description: "Convert CSV data files to PDF", slug: "csv-to-pdf" },
+            { name: "Convert to Grayscale", description: "Convert colorful PDF to black and white", slug: "grayscale-converter" },
+            { name: "PDF Overlay Tool", description: "Layer and combine PDF documents visually", slug: "pdf-overlay" },
+            { name: "Batch PDF Renamer", description: "Rename multiple PDF files at once", slug: "batch-renamer" },
+            { name: "PDF Thumbnail Viewer", description: "Generate mini previews of PDF pages", slug: "thumbnail-viewer" },
+            { name: "Scan to PDF", description: "Use camera to scan documents to PDF", slug: "scan-to-pdf" },
+            { name: "HTML to PDF", description: "Convert web pages and HTML to PDF", slug: "html-to-pdf" },
+            { name: "LaTeX to PDF", description: "Compile LaTeX documents to PDF", slug: "latex-to-pdf" },
+            { name: "DOC to HTML", description: "Extract HTML content from DOC files", slug: "doc-to-html" },
+            { name: "Excel Table Viewer", description: "View and browse Excel table data", slug: "excel-table-viewer" },
+            { name: "XLSX Viewer Tool", description: "Open and view Excel files in browser", slug: "xlsx-viewer" },
+            { name: "Form Auto-Filler", description: "Automatically populate PDF form fields", slug: "form-autofill" },
+            { name: "PDF to HTML", description: "Convert PDF documents to HTML format", slug: "pdf-to-html" },
+            { name: "HTML to Word", description: "Convert web content to Word documents", slug: "html-to-word" },
+            { name: "Metadata Editor", description: "Edit PDF properties like title and author", slug: "metadata-editor" },
+            { name: "Crop PDF Pages", description: "Trim and crop specific areas of PDF", slug: "crop-pdf" },
+            { name: "Encrypt PDF", description: "Add password protection to PDF files", slug: "encrypt-pdf" },
+            { name: "Decrypt PDF", description: "Remove passwords from protected PDFs", slug: "decrypt-pdf" },
+            { name: "Booklet Creator", description: "Create printable booklet layouts", slug: "booklet-creator" },
+            { name: "Reverse PDF Order", description: "Flip the order of PDF pages", slug: "reverse-pages" },
+            { name: "Bates Numbering", description: "Add legal document numbering system", slug: "bates-numbering" },
+            { name: "RTF to PDF", description: "Convert Rich Text Format files to PDF", slug: "rtf-to-pdf" },
+            { name: "Calendar Generator", description: "Create custom PDF calendar templates", slug: "calendar-generator" },
+            { name: "PDF to EPUB", description: "Convert PDF to ebook EPUB format", slug: "pdf-to-epub" },
+            { name: "EPUB to PDF", description: "Convert ebook files to PDF format", slug: "epub-to-pdf" },
+            { name: "PDF to Markdown", description: "Extract content to Markdown format", slug: "pdf-to-md" },
+            { name: "Markdown to PDF", description: "Convert Markdown files to PDF", slug: "md-to-pdf" },
+            { name: "DOCX Viewer", description: "Open and view Word documents online", slug: "docx-viewer" },
+            { name: "XLSX to CSV", description: "Convert Excel files to CSV format", slug: "xlsx-to-csv" },
+            { name: "CSV to XLSX", description: "Convert CSV data back to Excel format", slug: "csv-to-xlsx" },
+            { name: "PPTX to PDF", description: "Convert PowerPoint presentations to PDF", slug: "pptx-to-pdf" },
+            { name: "PDF to PPTX", description: "Convert PDF pages to PowerPoint slides", slug: "pdf-to-pptx" },
+            { name: "Slide Deck Previewer", description: "Preview presentation slide thumbnails", slug: "slide-deck-previewer" },
+            { name: "Resume Formatter", description: "Format and style resume documents", slug: "resume-formatter" },
+            { name: "Resume Scanner", description: "Extract and analyze resume information", slug: "resume-scanner" },
+            { name: "OCR PDF Tool", description: "Extract text from scanned PDF documents", slug: "ocr-pdf" }
+        ];
+
+        // DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const toolsGrid = document.getElementById('toolsGrid');
+        const resultsCount = document.getElementById('resultsCount');
+        const noResults = document.getElementById('noResults');
+
+        // Render tools
+        function renderTools(tools) {
+            if (tools.length === 0) {
+                toolsGrid.style.display = 'none';
+                noResults.style.display = 'block';
+                resultsCount.textContent = 'No tools found';
+                return;
+            }
+
+            toolsGrid.style.display = 'grid';
+            noResults.style.display = 'none';
+            resultsCount.textContent = `${tools.length} tool${tools.length !== 1 ? 's' : ''} available`;
+
+            toolsGrid.innerHTML = tools.map(tool => `
+                <div class="tool-card" onclick="window.location.href='tools/${tool.slug}.html'" role="button" tabindex="0" aria-label="Open ${tool.name}">
+                    <div>
+                        <h2>${tool.name}</h2>
+                        <p>${tool.description}</p>
+                    </div>
+                    <div class="open-link">Open Tool →</div>
+                </div>
+            `).join('');
+
+            // Add keyboard navigation
+            document.querySelectorAll('.tool-card').forEach(card => {
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        card.click();
+                    }
+                });
+            });
+        }
+
+        // Search functionality
+        function searchTools(query) {
+            if (!query.trim()) {
+                renderTools(pdfTools);
+                return;
+            }
+
+            const filteredTools = pdfTools.filter(tool => 
+                tool.name.toLowerCase().includes(query.toLowerCase()) ||
+                tool.description.toLowerCase().includes(query.toLowerCase())
+            );
+            renderTools(filteredTools);
+        }
+
+        // Event listeners
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            searchTools(query);
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                searchInput.value = '';
+                renderTools(pdfTools);
+                searchInput.blur();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTools(pdfTools);
+        });
+
+        // Add loading state for tool cards
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.tool-card')) {
+                e.target.closest('.tool-card').classList.add('loading');
+            }
+        });
+
+        // Analytics tracking (placeholder)
+        function trackToolClick(toolName) {
+            // Add your analytics tracking code here
+            console.log(`Tool clicked: ${toolName}`);
+        }
+
+        // Add click tracking to tool cards
+        document.addEventListener('click', (e) => {
+            const toolCard = e.target.closest('.tool-card');
+            if (toolCard) {
+                const toolName = toolCard.querySelector('h2').textContent;
+                trackToolClick(toolName);
+            }
+        });
+    </script>
+</body>
+</html>
