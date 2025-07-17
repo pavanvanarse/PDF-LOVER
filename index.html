@@ -3,332 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All PDF Tools – Free Online PDF Editor, Converter & Viewer</title>
-    <meta name="description" content="Access 65+ browser-based PDF tools: merge, compress, convert, OCR, fill forms and more. 100% free and works on any device.">
-    <meta name="keywords" content="PDF tools, PDF converter, PDF merger, PDF editor, free online PDF, PDF compressor">
-    <meta name="author" content="PDF Tools">
-    
-    <!-- Open Graph / Facebook -->
+    <meta name="description" content="Explore 65+ free online PDF tools like merge, split, compress, convert, OCR, watermark, annotate, and more — 100% browser-based, secure and responsive.">
+    <meta name="keywords" content="PDF tools, merge PDF, split PDF, compress PDF, convert PDF, online PDF editor, free PDF tools">
+    <meta name="author" content="Ultimate PDF Toolkit">
+    <meta property="og:title" content="Ultimate PDF Toolkit – Free 65+ PDF Tools Online">
+    <meta property="og:description" content="Explore 65+ free online PDF tools like merge, split, compress, convert, OCR, watermark, annotate, and more — 100% browser-based, secure and responsive.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://yourpdftools.com/">
-    <meta property="og:title" content="All PDF Tools – Free Online PDF Editor, Converter & Viewer">
-    <meta property="og:description" content="Access 65+ browser-based PDF tools: merge, compress, convert, OCR, fill forms and more. 100% free and works on any device.">
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://yourpdftools.com/">
-    <meta property="twitter:title" content="All PDF Tools – Free Online PDF Editor, Converter & Viewer">
-    <meta property="twitter:description" content="Access 65+ browser-based PDF tools: merge, compress, convert, OCR, fill forms and more. 100% free and works on any device.">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Ultimate PDF Toolkit – Free 65+ PDF Tools Online</title>
     
     <style>
-        /* CSS Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        :root {
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
-            --secondary-color: #64748b;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --background: #ffffff;
-            --surface: #f8fafc;
-            --border: #e2e8f0;
-            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --border-radius: 8px;
-            --transition: all 0.2s ease-in-out;
-        }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
-            color: var(--text-primary);
-            background-color: var(--surface);
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
 
-        /* Header Styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
         header {
-            background: var(--background);
-            box-shadow: var(--shadow);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
             position: sticky;
             top: 0;
             z-index: 100;
+            animation: slideDown 0.6s ease-out;
         }
 
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem 1.5rem;
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .header-content {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding: 1rem 0;
             flex-wrap: wrap;
             gap: 1rem;
         }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-            color: var(--primary-color);
+        h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
             font-weight: 700;
-            font-size: 1.5rem;
-        }
-
-        .logo i {
-            font-size: 1.75rem;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        .nav-links a:hover {
-            color: var(--primary-color);
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #3b82f6 100%);
-            color: white;
-            text-align: center;
-            padding: 4rem 1.5rem 3rem;
-        }
-
-        .hero-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-
-        .hero .tagline {
-            font-size: 1.25rem;
-            opacity: 0.9;
-            margin-bottom: 2rem;
-            font-weight: 400;
-        }
-
-        /* Search Section */
-        .search-section {
-            background: var(--background);
-            padding: 2rem 1.5rem;
-            box-shadow: var(--shadow);
-            position: relative;
-            z-index: 10;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .search-container {
-            max-width: 800px;
-            margin: 0 auto;
             position: relative;
+            min-width: 300px;
+            flex: 1;
+            max-width: 400px;
         }
 
-        .search-box {
-            position: relative;
+        #searchInput {
             width: 100%;
+            padding: 12px 50px 12px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
         }
 
-        .search-input {
-            width: 100%;
-            padding: 1rem 1rem 1rem 3rem;
-            border: 2px solid var(--border);
-            border-radius: var(--border-radius);
-            font-size: 1.1rem;
-            background: var(--surface);
-            transition: var(--transition);
-        }
-
-        .search-input:focus {
+        #searchInput:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .search-icon {
             position: absolute;
-            left: 1rem;
+            right: 20px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-secondary);
-            font-size: 1.1rem;
+            color: #666;
+            font-size: 18px;
         }
 
-        .results-count {
-            text-align: center;
-            margin-top: 1rem;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        /* Main Content */
         main {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
+            padding: 2rem 0;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
         }
 
-        .tools-section h2 {
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .intro {
             text-align: center;
             margin-bottom: 3rem;
-            font-size: 2rem;
-            color: var(--text-primary);
+            color: white;
         }
 
-        /* Tools Grid */
+        .intro h2 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .intro p {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .category-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            border-color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 3rem;
+            margin-top: 2rem;
         }
 
         .tool-card {
-            background: var(--background);
-            border-radius: var(--border-radius);
+            background: white;
+            border-radius: 20px;
             padding: 1.5rem;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            text-decoration: none;
-            color: inherit;
-            display: block;
-            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out both;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
         }
 
         .tool-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--primary-color);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .tool-card:hover::before {
+            transform: scaleX(1);
         }
 
         .tool-icon {
-            font-size: 2rem;
-            color: var(--primary-color);
+            font-size: 2.5rem;
             margin-bottom: 1rem;
             display: block;
         }
 
-        .tool-name {
-            font-size: 1.25rem;
-            font-weight: 600;
+        .tool-card h3 {
+            font-size: 1.3rem;
             margin-bottom: 0.5rem;
-            color: var(--text-primary);
+            color: #2d3748;
+            font-weight: 600;
         }
 
-        .tool-description {
-            color: var(--text-secondary);
+        .tool-card p {
+            color: #666;
+            margin-bottom: 1.5rem;
             font-size: 0.95rem;
             line-height: 1.5;
         }
 
-        /* No Results */
+        .tool-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .tool-link:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .tool-link::after {
+            content: '→';
+            transition: transform 0.3s ease;
+        }
+
+        .tool-link:hover::after {
+            transform: translateX(3px);
+        }
+
+        .category-section {
+            margin-bottom: 3rem;
+        }
+
+        .category-title {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
         .no-results {
             text-align: center;
-            padding: 3rem 1rem;
-            color: var(--text-secondary);
+            color: white;
+            font-size: 1.2rem;
+            margin: 3rem 0;
+            opacity: 0.8;
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .hidden {
             display: none;
         }
 
-        .no-results i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        /* Footer */
-        footer {
-            background: var(--text-primary);
-            color: white;
-            text-align: center;
-            padding: 3rem 1.5rem 2rem;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .footer-content h3 {
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
-
-        .footer-content p {
-            opacity: 0.8;
-            margin-bottom: 2rem;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            color: white;
-            text-decoration: none;
-            opacity: 0.8;
-            transition: var(--transition);
-        }
-
-        .footer-links a:hover {
-            opacity: 1;
-        }
-
-        .footer-bottom {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 1rem;
-            opacity: 0.6;
-            font-size: 0.9rem;
-        }
-
-        /* Responsive Design */
         @media (max-width: 768px) {
-            .header-container {
+            .header-content {
                 flex-direction: column;
                 text-align: center;
             }
 
-            .nav-links {
-                gap: 1rem;
-            }
-
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .hero .tagline {
-                font-size: 1rem;
+            .search-container {
+                min-width: 100%;
+                max-width: 100%;
             }
 
             .tools-grid {
@@ -336,247 +306,317 @@
                 gap: 1rem;
             }
 
-            .footer-links {
-                flex-direction: column;
-                gap: 1rem;
+            .category-filter {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+
+            .filter-btn {
+                flex-shrink: 0;
             }
         }
 
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .tools-grid {
-                grid-template-columns: repeat(2, 1fr);
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .tool-card {
+                padding: 1.2rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
             }
         }
 
-        @media (min-width: 1025px) {
-            .tools-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        /* Loading Animation */
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-
-        /* Accessibility */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
+        /* Animation delays for staggered effect */
+        .tool-card:nth-child(1) { animation-delay: 0.1s; }
+        .tool-card:nth-child(2) { animation-delay: 0.2s; }
+        .tool-card:nth-child(3) { animation-delay: 0.3s; }
+        .tool-card:nth-child(4) { animation-delay: 0.4s; }
+        .tool-card:nth-child(5) { animation-delay: 0.5s; }
+        .tool-card:nth-child(6) { animation-delay: 0.6s; }
     </style>
 </head>
-
 <body>
-    <header>
-        <nav class="header-container">
-            <a href="/" class="logo" aria-label="PDF Tools Home">
-                <i class="fas fa-file-pdf" aria-hidden="true"></i>
-                <span>PDF Tools</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="#tools">Tools</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
+    <header role="banner">
+        <div class="container">
+            <div class="header-content">
+                <h1>Ultimate PDF Toolkit</h1>
+                <div class="search-container">
+                    <input 
+                        type="search" 
+                        id="searchInput" 
+                        placeholder="Search PDF tools..." 
+                        aria-label="Search PDF tools"
+                        autocomplete="off"
+                    >
+                    <span class="search-icon" aria-hidden="true">🔍</span>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <section class="hero">
-        <div class="hero-container">
-            <h1>65+ Free PDF Tools</h1>
-            <p class="tagline">Right in Your Browser – No Downloads Required</p>
+    <main role="main">
+        <div class="container">
+            <section class="intro">
+                <h2>65+ Free Online PDF Tools</h2>
+                <p>Professional PDF tools for all your document needs. Convert, edit, merge, split, compress, and more – all in your browser, completely free and secure.</p>
+            </section>
+
+            <nav role="navigation" aria-label="Tool categories">
+                <div class="category-filter">
+                    <button class="filter-btn active" data-category="all" aria-pressed="true">All Tools</button>
+                    <button class="filter-btn" data-category="convert" aria-pressed="false">Convert</button>
+                    <button class="filter-btn" data-category="edit" aria-pressed="false">Edit</button>
+                    <button class="filter-btn" data-category="organize" aria-pressed="false">Organize</button>
+                    <button class="filter-btn" data-category="security" aria-pressed="false">Security</button>
+                    <button class="filter-btn" data-category="view" aria-pressed="false">View & Read</button>
+                    <button class="filter-btn" data-category="optimize" aria-pressed="false">Optimize</button>
+                </div>
+            </nav>
+
+            <section id="toolsContainer" role="region" aria-label="PDF tools">
+                <!-- Tools will be injected here by JavaScript -->
+            </section>
+
+            <div id="noResults" class="no-results hidden" role="status" aria-live="polite">
+                <p>No tools found matching your search. Try different keywords or browse all categories.</p>
+            </div>
         </div>
-    </section>
-
-    <section class="search-section">
-        <div class="search-container">
-            <div class="search-box">
-                <i class="fas fa-search search-icon" aria-hidden="true"></i>
-                <input 
-                    type="text" 
-                    class="search-input" 
-                    id="searchInput"
-                    placeholder="Search PDF tools..." 
-                    aria-label="Search PDF tools"
-                    autocomplete="off"
-                >
-            </div>
-            <div class="results-count" id="resultsCount">
-                65 tools available
-            </div>
-        </div>
-    </section>
-
-    <main>
-        <section class="tools-section" id="tools">
-            <h2>Choose Your PDF Tool</h2>
-            
-            <div class="tools-grid" id="toolsGrid">
-                <!-- Tool cards will be populated by JavaScript -->
-            </div>
-
-            <div class="no-results" id="noResults">
-                <i class="fas fa-search" aria-hidden="true"></i>
-                <h3>No tools found</h3>
-                <p>Try adjusting your search terms or browse all available tools.</p>
-            </div>
-        </section>
     </main>
 
-    <footer>
-        <div class="footer-content">
-            <h3>PDF Tools</h3>
-            <p>Your complete solution for PDF manipulation, conversion, and editing – all in your browser.</p>
-            
-            <div class="footer-links">
-                <a href="/privacy">Privacy Policy</a>
-                <a href="/terms">Terms of Service</a>
-                <a href="/help">Help Center</a>
-                <a href="/api">Developer API</a>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2024 PDF Tools. All rights reserved.</p>
-            </div>
+    <footer role="contentinfo">
+        <div class="container">
+            <p>&copy; 2025 Ultimate PDF Toolkit. All rights reserved. Free online PDF tools for everyone.</p>
         </div>
     </footer>
 
     <script>
         // PDF Tools Data
         const pdfTools = [
-            { name: "PDF Merger", description: "Combine multiple PDF files into one", icon: "fas fa-layer-group", slug: "pdf-merger" },
-            { name: "PDF Splitter", description: "Split PDF into separate pages", icon: "fas fa-cut", slug: "pdf-splitter" },
-            { name: "PDF Compressor", description: "Reduce PDF file size", icon: "fas fa-compress-alt", slug: "pdf-compressor" },
-            { name: "PDF to Image", description: "Convert PDF pages to images", icon: "fas fa-image", slug: "pdf-to-image" },
-            { name: "Image to PDF", description: "Turn images into PDF document", icon: "fas fa-images", slug: "image-to-pdf" },
-            { name: "PDF Unlocker", description: "Remove PDF passwords", icon: "fas fa-unlock", slug: "pdf-unlocker" },
-            { name: "PDF Text Extractor", description: "Extract all text from PDF", icon: "fas fa-text-width", slug: "pdf-text-extractor" },
-            { name: "PDF to Text", description: "Save PDF content as text file", icon: "fas fa-file-alt", slug: "pdf-to-text" },
-            { name: "Rearrange PDF Pages", description: "Reorder PDF pages", icon: "fas fa-sort", slug: "rearrange-pages" },
-            { name: "PDF Watermark Adder", description: "Add watermark to PDF", icon: "fas fa-stamp", slug: "pdf-watermark" },
-            { name: "PDF Annotator", description: "Draw and annotate on PDF", icon: "fas fa-pen", slug: "pdf-annotator" },
-            { name: "Add Page Numbers", description: "Add numbering to pages", icon: "fas fa-list-ol", slug: "add-page-numbers" },
-            { name: "Remove PDF Borders", description: "Trim margins from PDF", icon: "fas fa-crop", slug: "remove-borders" },
-            { name: "Live PDF Viewer", description: "Preview PDF with scroll", icon: "fas fa-eye", slug: "live-pdf-viewer" },
-            { name: "PDF Signature", description: "Add digital signature", icon: "fas fa-signature", slug: "pdf-signature" },
-            { name: "PDF to Excel", description: "Convert PDF to Excel format", icon: "fas fa-table", slug: "pdf-to-excel" },
-            { name: "Excel to PDF", description: "Convert Excel files to PDF", icon: "fas fa-file-excel", slug: "excel-to-pdf" },
-            { name: "PDF to Word", description: "Convert PDF to DOCX", icon: "fas fa-file-word", slug: "pdf-to-word" },
-            { name: "Word to PDF", description: "Convert Word documents to PDF", icon: "fas fa-file-word", slug: "word-to-pdf" },
-            { name: "Delete PDF Pages", description: "Remove specific pages", icon: "fas fa-trash", slug: "delete-pages" },
-            { name: "Duplicate PDF Pages", description: "Copy pages within PDF", icon: "fas fa-copy", slug: "duplicate-pages" },
-            { name: "Rotate PDF Pages", description: "Rotate pages orientation", icon: "fas fa-undo", slug: "rotate-pages" },
-            { name: "Drag & Drop Merger", description: "Merge PDFs with drag interface", icon: "fas fa-hand-paper", slug: "drag-drop-merger" },
-            { name: "Compare PDFs", description: "Highlight differences between PDFs", icon: "fas fa-not-equal", slug: "compare-pdfs" },
-            { name: "Redact Text", description: "Blackout sensitive information", icon: "fas fa-user-secret", slug: "redact-pdf" },
-            { name: "Fill PDF Forms", description: "Fill and export form data", icon: "fas fa-edit", slug: "fill-forms" },
-            { name: "Extract Images", description: "Save embedded images", icon: "fas fa-photo-video", slug: "extract-images" },
-            { name: "Background Remover", description: "Remove PDF backgrounds", icon: "fas fa-eraser", slug: "background-remover" },
-            { name: "PDF to CSV", description: "Convert PDF tables to CSV", icon: "fas fa-file-csv", slug: "pdf-to-csv" },
-            { name: "CSV to PDF", description: "Convert CSV files to PDF", icon: "fas fa-file-csv", slug: "csv-to-pdf" },
-            { name: "Convert to Grayscale", description: "Make PDF black and white", icon: "fas fa-adjust", slug: "grayscale-converter" },
-            { name: "PDF Overlay Tool", description: "Overlay PDFs visually", icon: "fas fa-layer-group", slug: "pdf-overlay" },
-            { name: "Batch PDF Renamer", description: "Rename multiple PDF files", icon: "fas fa-i-cursor", slug: "batch-renamer" },
-            { name: "PDF Thumbnail Viewer", description: "Mini page previews", icon: "fas fa-th", slug: "thumbnail-viewer" },
-            { name: "Scan to PDF", description: "Use webcam to scan documents", icon: "fas fa-camera", slug: "scan-to-pdf" },
-            { name: "HTML to PDF", description: "Convert webpages to PDF", icon: "fas fa-code", slug: "html-to-pdf" },
-            { name: "LaTeX to PDF", description: "Convert mathematical equations", icon: "fas fa-square-root-alt", slug: "latex-to-pdf" },
-            { name: "DOC to HTML", description: "Extract HTML from documents", icon: "fas fa-code", slug: "doc-to-html" },
-            { name: "Excel Table Viewer", description: "View Excel tables", icon: "fas fa-table", slug: "excel-table-viewer" },
-            { name: "XLSX Viewer Tool", description: "Open and view Excel files", icon: "fas fa-file-excel", slug: "xlsx-viewer" },
-            { name: "Form Auto-Filler", description: "Automatically fill PDF forms", icon: "fas fa-magic", slug: "form-autofill" },
-            { name: "PDF to HTML", description: "Convert PDF to HTML format", icon: "fas fa-code", slug: "pdf-to-html" },
-            { name: "HTML to Word", description: "Save webpage to Word format", icon: "fas fa-file-word", slug: "html-to-word" },
-            { name: "Metadata Editor", description: "Edit PDF title and author", icon: "fas fa-info-circle", slug: "metadata-editor" },
-            { name: "Crop PDF Pages", description: "Trim and crop page content", icon: "fas fa-crop-alt", slug: "crop-pdf" },
-            { name: "Encrypt PDF", description: "Add password protection", icon: "fas fa-lock", slug: "encrypt-pdf" },
-            { name: "Decrypt PDF", description: "Remove password protection", icon: "fas fa-unlock-alt", slug: "decrypt-pdf" },
-            { name: "Booklet Creator", description: "Create booklet-style layout", icon: "fas fa-book", slug: "booklet-creator" },
-            { name: "Reverse PDF Order", description: "Flip page order", icon: "fas fa-exchange-alt", slug: "reverse-pages" },
-            { name: "Bates Numbering", description: "Legal document numbering", icon: "fas fa-hashtag", slug: "bates-numbering" },
-            { name: "RTF to PDF", description: "Convert RTF files to PDF", icon: "fas fa-file-alt", slug: "rtf-to-pdf" },
-            { name: "Calendar Generator", description: "Create PDF calendars", icon: "fas fa-calendar", slug: "calendar-generator" },
-            { name: "PDF to EPUB", description: "Convert PDF to ebook format", icon: "fas fa-book-open", slug: "pdf-to-epub" },
-            { name: "EPUB to PDF", description: "Convert ebooks to PDF", icon: "fas fa-book", slug: "epub-to-pdf" },
-            { name: "PDF to Markdown", description: "Extract content to Markdown", icon: "fab fa-markdown", slug: "pdf-to-md" },
-            { name: "Markdown to PDF", description: "Convert Markdown to PDF", icon: "fab fa-markdown", slug: "md-to-pdf" },
-            { name: "DOCX Viewer", description: "Open and view Word files", icon: "fas fa-file-word", slug: "docx-viewer" },
-            { name: "XLSX to CSV", description: "Convert Excel to CSV", icon: "fas fa-exchange-alt", slug: "xlsx-to-csv" },
-            { name: "CSV to XLSX", description: "Convert CSV back to Excel", icon: "fas fa-exchange-alt", slug: "csv-to-xlsx" },
-            { name: "PPTX to PDF", description: "Convert slides to PDF", icon: "fas fa-file-powerpoint", slug: "pptx-to-pdf" },
-            { name: "PDF to PPTX", description: "Convert PDF to slides", icon: "fas fa-file-powerpoint", slug: "pdf-to-pptx" },
-            { name: "Slide Deck Previewer", description: "Preview slide thumbnails", icon: "fas fa-images", slug: "slide-deck-previewer" },
-            { name: "Resume Formatter", description: "Format resume documents", icon: "fas fa-user-tie", slug: "resume-formatter" },
-            { name: "Resume Scanner", description: "Scan and extract resume data", icon: "fas fa-search", slug: "resume-scanner" },
-            { name: "OCR PDF Tool", description: "Extract text from scanned PDFs", icon: "fas fa-text-height", slug: "ocr-pdf" }
+            // Convert Category
+            { name: "PDF to Word", icon: "📝", description: "Convert PDF files to editable Word documents with preserved formatting.", category: "convert", path: "tools/pdf-to-word.html" },
+            { name: "Word to PDF", icon: "📄", description: "Convert Word documents to PDF format quickly and easily.", category: "convert", path: "tools/word-to-pdf.html" },
+            { name: "PDF to Excel", icon: "📊", description: "Extract tables and data from PDF to Excel spreadsheets.", category: "convert", path: "tools/pdf-to-excel.html" },
+            { name: "Excel to PDF", icon: "📈", description: "Convert Excel spreadsheets to PDF with formatting intact.", category: "convert", path: "tools/excel-to-pdf.html" },
+            { name: "PDF to PowerPoint", icon: "🎯", description: "Convert PDF pages to editable PowerPoint presentations.", category: "convert", path: "tools/pdf-to-powerpoint.html" },
+            { name: "PowerPoint to PDF", icon: "📋", description: "Convert presentations to PDF format for easy sharing.", category: "convert", path: "tools/powerpoint-to-pdf.html" },
+            { name: "PDF to Images", icon: "🖼️", description: "Convert PDF pages to JPG, PNG, or other image formats.", category: "convert", path: "tools/pdf-to-images.html" },
+            { name: "Images to PDF", icon: "🖼️", description: "Combine multiple images into a single PDF document.", category: "convert", path: "tools/images-to-pdf.html" },
+            { name: "PDF to HTML", icon: "🌐", description: "Convert PDF content to HTML format for web use.", category: "convert", path: "tools/pdf-to-html.html" },
+            { name: "HTML to PDF", icon: "📄", description: "Convert web pages and HTML content to PDF format.", category: "convert", path: "tools/html-to-pdf.html" },
+            { name: "PDF to Text", icon: "📝", description: "Extract plain text content from PDF documents.", category: "convert", path: "tools/pdf-to-text.html" },
+            { name: "Text to PDF", icon: "📄", description: "Create PDF documents from plain text files.", category: "convert", path: "tools/text-to-pdf.html" },
+
+            // Edit Category
+            { name: "PDF Editor", icon: "✏️", description: "Edit PDF content, add text, images, and shapes directly.", category: "edit", path: "tools/pdf-editor.html" },
+            { name: "PDF Annotator", icon: "✍️", description: "Add comments, highlights, and annotations to PDFs.", category: "edit", path: "tools/pdf-annotator.html" },
+            { name: "Add Watermark", icon: "🔐", description: "Add text or image watermarks to protect your PDFs.", category: "edit", path: "tools/add-watermark.html" },
+            { name: "Remove Watermark", icon: "🗑️", description: "Remove unwanted watermarks from PDF documents.", category: "edit", path: "tools/remove-watermark.html" },
+            { name: "Add Page Numbers", icon: "🔢", description: "Insert page numbers in various positions and formats.", category: "edit", path: "tools/add-page-numbers.html" },
+            { name: "Add Header Footer", icon: "📄", description: "Add headers and footers to PDF pages.", category: "edit", path: "tools/add-header-footer.html" },
+            { name: "PDF Form Creator", icon: "📝", description: "Create fillable forms with text fields and checkboxes.", category: "edit", path: "tools/pdf-form-creator.html" },
+            { name: "PDF Form Filler", icon: "✏️", description: "Fill out PDF forms electronically and save results.", category: "edit", path: "tools/pdf-form-filler.html" },
+            { name: "Crop PDF", icon: "✂️", description: "Crop PDF pages to remove unwanted margins or content.", category: "edit", path: "tools/crop-pdf.html" },
+            { name: "Resize PDF", icon: "📏", description: "Resize PDF pages to different dimensions and formats.", category: "edit", path: "tools/resize-pdf.html" },
+
+            // Organize Category
+            { name: "Merge PDF", icon: "🔗", description: "Combine multiple PDF files into a single document.", category: "organize", path: "tools/merge-pdf.html" },
+            { name: "Split PDF", icon: "✂️", description: "Split PDF documents into separate pages or sections.", category: "organize", path: "tools/split-pdf.html" },
+            { name: "Extract Pages", icon: "📄", description: "Extract specific pages from PDF documents.", category: "organize", path: "tools/extract-pages.html" },
+            { name: "Delete Pages", icon: "🗑️", description: "Remove unwanted pages from PDF documents.", category: "organize", path: "tools/delete-pages.html" },
+            { name: "Rotate PDF", icon: "🔄", description: "Rotate PDF pages to correct orientation.", category: "organize", path: "tools/rotate-pdf.html" },
+            { name: "Reorder Pages", icon: "🔀", description: "Rearrange the order of pages in PDF documents.", category: "organize", path: "tools/reorder-pages.html" },
+            { name: "Add Blank Pages", icon: "➕", description: "Insert blank pages at specific positions in PDFs.", category: "organize", path: "tools/add-blank-pages.html" },
+            { name: "PDF Organizer", icon: "📚", description: "Comprehensive tool to organize PDF page structure.", category: "organize", path: "tools/pdf-organizer.html" },
+
+            // Security Category
+            { name: "Protect PDF", icon: "🔒", description: "Add password protection and security to PDF files.", category: "security", path: "tools/protect-pdf.html" },
+            { name: "Unlock PDF", icon: "🔓", description: "Remove passwords and unlock protected PDF files.", category: "security", path: "tools/unlock-pdf.html" },
+            { name: "Digital Signature", icon: "✍️", description: "Add digital signatures to authenticate PDF documents.", category: "security", path: "tools/digital-signature.html" },
+            { name: "Redact PDF", icon: "🖍️", description: "Permanently remove sensitive information from PDFs.", category: "security", path: "tools/redact-pdf.html" },
+            { name: "PDF Encryption", icon: "🛡️", description: "Encrypt PDF files with advanced security settings.", category: "security", path: "tools/pdf-encryption.html" },
+            { name: "Remove Metadata", icon: "🧹", description: "Strip metadata and hidden information from PDFs.", category: "security", path: "tools/remove-metadata.html" },
+
+            // View & Read Category
+            { name: "PDF Reader", icon: "👁️", description: "View and read PDF documents in your browser.", category: "view", path: "tools/pdf-reader.html" },
+            { name: "PDF Viewer", icon: "📖", description: "Advanced PDF viewer with zoom and navigation tools.", category: "view", path: "tools/pdf-viewer.html" },
+            { name: "PDF Preview", icon: "🔍", description: "Quick preview of PDF contents and thumbnails.", category: "view", path: "tools/pdf-preview.html" },
+            { name: "Search PDF", icon: "🔍", description: "Search for text and keywords within PDF documents.", category: "view", path: "tools/search-pdf.html" },
+            { name: "PDF Bookmark Manager", icon: "🔖", description: "Add, edit, and manage bookmarks in PDF files.", category: "view", path: "tools/pdf-bookmark-manager.html" },
+            { name: "PDF Compare", icon: "⚖️", description: "Compare two PDF documents and highlight differences.", category: "view", path: "tools/pdf-compare.html" },
+
+            // Optimize Category
+            { name: "Compress PDF", icon: "🗜️", description: "Reduce PDF file size while maintaining quality.", category: "optimize", path: "tools/compress-pdf.html" },
+            { name: "Optimize PDF", icon: "⚡", description: "Optimize PDFs for faster loading and smaller size.", category: "optimize", path: "tools/optimize-pdf.html" },
+            { name: "PDF Validator", icon: "✅", description: "Validate PDF structure and compliance standards.", category: "optimize", path: "tools/pdf-validator.html" },
+            { name: "Repair PDF", icon: "🔧", description: "Fix corrupted or damaged PDF files.", category: "optimize", path: "tools/repair-pdf.html" },
+            { name: "PDF Statistics", icon: "📊", description: "View detailed statistics and properties of PDF files.", category: "optimize", path: "tools/pdf-statistics.html" },
+            { name: "OCR PDF", icon: "👁️", description: "Extract text from scanned PDFs using OCR technology.", category: "optimize", path: "tools/ocr-pdf.html" },
+
+            // Additional specialized tools
+            { name: "PDF to CSV", icon: "📈", description: "Extract table data from PDF and convert to CSV format.", category: "convert", path: "tools/pdf-to-csv.html" },
+            { name: "CSV to PDF", icon: "📄", description: "Convert CSV data files to formatted PDF documents.", category: "convert", path: "tools/csv-to-pdf.html" },
+            { name: "PDF Certificate Creator", icon: "🏆", description: "Create professional certificates and awards in PDF format.", category: "edit", path: "tools/pdf-certificate-creator.html" },
+            { name: "PDF Invoice Generator", icon: "🧾", description: "Generate professional invoices in PDF format.", category: "edit", path: "tools/pdf-invoice-generator.html" },
+            { name: "PDF QR Code Generator", icon: "📱", description: "Generate QR codes and embed them in PDF documents.", category: "edit", path: "tools/pdf-qr-generator.html" },
+            { name: "PDF Barcode Generator", icon: "📊", description: "Create and insert barcodes into PDF documents.", category: "edit", path: "tools/pdf-barcode-generator.html" },
+            { name: "PDF Calendar Creator", icon: "📅", description: "Create custom calendars in PDF format.", category: "edit", path: "tools/pdf-calendar-creator.html" },
+            { name: "PDF Report Generator", icon: "📋", description: "Generate professional reports with charts and tables.", category: "edit", path: "tools/pdf-report-generator.html" },
+            { name: "PDF Slideshow", icon: "🎬", description: "Convert PDF pages into an interactive slideshow.", category: "view", path: "tools/pdf-slideshow.html" },
+            { name: "PDF Archive", icon: "📦", description: "Create archives of multiple PDFs with indexing.", category: "organize", path: "tools/pdf-archive.html" },
+            { name: "PDF Batch Processor", icon: "⚙️", description: "Process multiple PDFs with batch operations.", category: "optimize", path: "tools/pdf-batch-processor.html" },
+            { name: "PDF API Tester", icon: "🔧", description: "Test PDF processing APIs and validate responses.", category: "optimize", path: "tools/pdf-api-tester.html" },
+            { name: "PDF Accessibility Checker", icon: "♿", description: "Check PDF accessibility compliance and standards.", category: "optimize", path: "tools/pdf-accessibility-checker.html" },
+            { name: "PDF Color Extractor", icon: "🎨", description: "Extract color palettes and schemes from PDF documents.", category: "view", path: "tools/pdf-color-extractor.html" },
+            { name: "PDF Font Analyzer", icon: "📝", description: "Analyze fonts used in PDF documents.", category: "view", path: "tools/pdf-font-analyzer.html" },
+            { name: "PDF Link Extractor", icon: "🔗", description: "Extract all hyperlinks and URLs from PDF files.", category: "view", path: "tools/pdf-link-extractor.html" },
+            { name: "PDF Version Converter", icon: "🔄", description: "Convert between different PDF format versions.", category: "convert", path: "tools/pdf-version-converter.html" }
         ];
 
         // DOM Elements
         const searchInput = document.getElementById('searchInput');
-        const toolsGrid = document.getElementById('toolsGrid');
-        const resultsCount = document.getElementById('resultsCount');
+        const toolsContainer = document.getElementById('toolsContainer');
         const noResults = document.getElementById('noResults');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+
+        let currentCategory = 'all';
+        let searchQuery = '';
+
+        // Initialize the application
+        function init() {
+            renderTools();
+            setupEventListeners();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            searchInput.addEventListener('input', handleSearch);
+            
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', handleCategoryFilter);
+            });
+        }
+
+        // Handle search input
+        function handleSearch(e) {
+            searchQuery = e.target.value.toLowerCase().trim();
+            renderTools();
+        }
+
+        // Handle category filtering
+        function handleCategoryFilter(e) {
+            const category = e.target.dataset.category;
+            
+            // Update active button
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-pressed', 'false');
+            });
+            
+            e.target.classList.add('active');
+            e.target.setAttribute('aria-pressed', 'true');
+            
+            currentCategory = category;
+            renderTools();
+        }
+
+        // Filter tools based on search and category
+        function filterTools() {
+            return pdfTools.filter(tool => {
+                const matchesCategory = currentCategory === 'all' || tool.category === currentCategory;
+                const matchesSearch = !searchQuery || 
+                    tool.name.toLowerCase().includes(searchQuery) ||
+                    tool.description.toLowerCase().includes(searchQuery);
+                
+                return matchesCategory && matchesSearch;
+            });
+        }
 
         // Render tools
-        function renderTools(tools) {
-            if (tools.length === 0) {
-                toolsGrid.style.display = 'none';
-                noResults.style.display = 'block';
-                resultsCount.textContent = 'No tools found';
+        function renderTools() {
+            const filteredTools = filterTools();
+            
+            if (filteredTools.length === 0) {
+                toolsContainer.innerHTML = '';
+                noResults.classList.remove('hidden');
                 return;
             }
-
-            toolsGrid.style.display = 'grid';
-            noResults.style.display = 'none';
-            resultsCount.textContent = `${tools.length} tool${tools.length !== 1 ? 's' : ''} found`;
-
-            toolsGrid.innerHTML = tools.map(tool => `
-                <a href="tools/${tool.slug}.html" class="tool-card" aria-label="${tool.name} - ${tool.description}">
-                    <i class="${tool.icon} tool-icon" aria-hidden="true"></i>
-                    <h3 class="tool-name">${tool.name}</h3>
-                    <p class="tool-description">${tool.description}</p>
-                </a>
-            `).join('');
+            
+            noResults.classList.add('hidden');
+            
+            if (currentCategory === 'all' && !searchQuery) {
+                renderToolsByCategory(filteredTools);
+            } else {
+                renderToolsGrid(filteredTools);
+            }
         }
 
-        // Search functionality
-        function searchTools(query) {
-            const filteredTools = pdfTools.filter(tool => 
-                tool.name.toLowerCase().includes(query.toLowerCase()) ||
-                tool.description.toLowerCase().includes(query.toLowerCase())
-            );
-            renderTools(filteredTools);
+        // Render tools grouped by category
+        function renderToolsByCategory(tools) {
+            const categories = {
+                convert: "Convert & Transform",
+                edit: "Edit & Modify", 
+                organize: "Organize & Structure",
+                security: "Security & Protection",
+                view: "View & Analyze",
+                optimize: "Optimize & Enhance"
+            };
+            
+            let html = '';
+            
+            Object.entries(categories).forEach(([categoryKey, categoryTitle]) => {
+                const categoryTools = tools.filter(tool => tool.category === categoryKey);
+                
+                if (categoryTools.length > 0) {
+                    html += `
+                        <section class="category-section">
+                            <h2 class="category-title">${categoryTitle}</h2>
+                            <div class="tools-grid">
+                                ${categoryTools.map(tool => createToolCard(tool)).join('')}
+                            </div>
+                        </section>
+                    `;
+                }
+            });
+            
+            toolsContainer.innerHTML = html;
         }
 
-        // Event listeners
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.trim();
-            searchTools(query);
-        });
+        // Render tools in a simple grid
+        function renderToolsGrid(tools) {
+            const html = `
+                <section class="category-section">
+                    <div class="tools-grid">
+                        ${tools.map(tool => createToolCard(tool)).join('')}
+                    </div>
+                </section>
+            `;
+            
+            toolsContainer.innerHTML = html;
+        }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            renderTools(pdfTools);
-        });
+        // Create individual tool card
+        function createToolCard(tool) {
+            return `
+                <article class="tool-card" data-category="${tool.category}">
+                    <span class="tool-icon" aria-hidden="true">${tool.icon}</span>
+                    <h3>${tool.name}</h3>
+                    <p>${tool.description}</p>
+                    <a href="${tool.path}" class="tool-link" aria-label="Open ${tool.name} tool">
+                        Use Tool
+                    </a>
+                </article>
+            `;
+        }
 
-        // Smooth scroll for navigation
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Add smooth scrolling for better UX
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -590,36 +630,38 @@
             });
         });
 
-        // Add loading state for tool cards
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.tool-card')) {
-                e.target.closest('.tool-card').classList.add('loading');
+        // Add keyboard navigation support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === '/' && e.target !== searchInput) {
+                e.preventDefault();
+                searchInput.focus();
             }
-        });
-
-        // Keyboard navigation for search
-        searchInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                searchInput.value = '';
-                renderTools(pdfTools);
+            
+            if (e.key === 'Escape' && e.target === searchInput) {
                 searchInput.blur();
+                searchInput.value = '';
+                searchQuery = '';
+                renderTools();
             }
         });
 
-        // Analytics tracking (placeholder)
-        function trackToolClick(toolName) {
-            // Add your analytics tracking code here
-            console.log(`Tool clicked: ${toolName}`);
+        // Performance optimization: Debounce search
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
         }
 
-        // Add click tracking to tool cards
-        document.addEventListener('click', (e) => {
-            const toolCard = e.target.closest('.tool-card');
-            if (toolCard) {
-                const toolName = toolCard.querySelector('.tool-name').textContent;
-                trackToolClick(toolName);
-            }
-        });
+        // Apply debouncing to search
+        const debouncedSearch = debounce(handleSearch, 300);
+        searchInput.removeEventListener('input', handleSearch);
+        searchInput.addEventListener('input', debouncedSearch);
     </script>
 </body>
 </html>
