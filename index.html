@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free online PDF tools suite with 65+ professional tools for PDF conversion, editing, merging, splitting, and more. No registration required.">
+    <meta name="keywords" content="PDF tools, PDF converter, PDF merger, PDF splitter, online PDF editor, free PDF tools">
+    <meta name="author" content="PDF Tools Pro">
+    <meta property="og:title" content="PDF Tools Pro - 65+ Free Online PDF Tools">
+    <meta property="og:description" content="Professional PDF tools for all your document needs. Convert, edit, merge, split, and more.">
+    <meta property="og:type" content="website">
+    <title>PDF Tools Pro - 65+ Free Online PDF Tools</title>
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.111/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <a href="#" class="logo" aria-label="PDF Tools Pro Homepage">
+                <span class="logo-icon">📄</span>
+                <span class="logo-text">PDF Tools Pro</span>
+            </a>
+            
+            <div class="nav-search">
+                <input type="search" 
+                       class="search-input" 
+                       placeholder="Search tools..." 
+                       id="search-tools"
+                       aria-label="Search PDF tools">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+            </div>
+            
+            <button class="nav-toggle" aria-label="Toggle navigation menu" id="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Professional PDF Tools Suite</h1>
+                <p class="hero-description">
+                    65+ powerful PDF tools for all your document needs. Convert, edit, merge, split, and more - all in your browser with complete privacy.
+                </p>
+                <div class="hero-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">🔐</span>
+                        <span>100% Secure</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">⚡</span>
+                        <span>Fast Processing</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📱</span>
+                        <span>Mobile Friendly</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Navigation -->
+        <nav class="category-nav" aria-label="Tool categories">
+            <div class="category-tabs">
+                <button class="category-tab active" data-category="all" aria-pressed="true">All Tools</button>
+                <button class="category-tab" data-category="convert" aria-pressed="false">Convert</button>
+                <button class="category-tab" data-category="edit" aria-pressed="false">Edit</button>
+                <button class="category-tab" data-category="view" aria-pressed="false">View</button>
+                <button class="category-tab" data-category="compress" aria-pressed="false">Compress</button>
+                <button class="category-tab" data-category="extract" aria-pressed="false">Extract</button>
+                <button class="category-tab" data-category="annotate" aria-pressed="false">Annotate</button>
+                <button class="category-tab" data-category="security" aria-pressed="false">Security</button>
+                <button class="category-tab" data-category="office" aria-pressed="false">Office</button>
+            </div>
+        </nav>
+
+        <!-- Tools Grid -->
+        <section class="tools-container">
+            <div class="tools-grid" id="tools-grid">
+                <!-- Tools will be dynamically loaded here -->
+            </div>
+        </section>
+
+        <!-- Quick Stats -->
+        <section class="stats">
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-number">65+</span>
+                    <span class="stat-label">PDF Tools</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Free to Use</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Registration Required</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>PDF Tools Pro</h3>
+                <p>Professional PDF tools for modern workflows. Process documents securely in your browser.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Tools</h4>
+                <ul>
+                    <li><a href="#pdf-merger">PDF Merger</a></li>
+                    <li><a href="#pdf-splitter">PDF Splitter</a></li>
+                    <li><a href="#pdf-converter">PDF Converter</a></li>
+                    <li><a href="#pdf-editor">PDF Editor</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#help">Help Center</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#privacy">Privacy Policy</a></li>
+                    <li><a href="#terms">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 PDF Tools Pro. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Processing your PDF...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/tools/pdf-tools.js"></script>
+    <script src="js/tools/converters.js"></script>
+    <script src="js/tools/viewers.js"></script>
+    <script src="js/tools/utilities.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
