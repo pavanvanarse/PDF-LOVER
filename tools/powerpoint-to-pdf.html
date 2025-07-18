@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPTX to PDF Converter</title>
+
+    <!-- Libraries from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pptx-js/0.4.2/pptxjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Google Fonts for a modern look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #c43e1c; /* PowerPoint brand orange */
+            --primary-hover: #a33417;
+            --success-color: #107c10;
+            --background-color: #f1f3f4;
+            --card-background: #ffffff;
+            --text-color: #202124;
+            --label-color: #5f6368;
+            --border-color: #dadce0;
+            --disabled-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- General Setup --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            background-color: var(--card-background);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        header h1 { font-size: 1.8rem; font-weight: 600; margin-bottom: 0.5rem; }
+        header p { font-size: 1rem; color: var(--label-color); margin-bottom: 2.5rem; }
+
+        /* --- File Upload Area --- */
+        .upload-area {
+            border: 3px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: border-color 0.3s, background-color 0.3s;
+            cursor: pointer;
+        }
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary-color);
+            background-color: #fafafa;
+        }
+        .upload-area input[type="file"] { display: none; }
+        .upload-area label { font-weight: 500; color: var(--primary-color); cursor: pointer; }
+        .upload-area #file-name { margin-top: 1rem; font-weight: 500; color: var(--label-color); }
+
+        /* --- Buttons --- */
+        .btn {
+            display: block; width: 100%; padding: 0.8rem 1rem; border: none;
+            border-radius: 8px; font-size: 1.1rem; font-weight: 500; cursor: pointer;
+            text-decoration: none; transition: all 0.2s ease-in-out;
+        }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover:not(:disabled) { background-color: var(--primary-hover); }
+        .btn:disabled { background-color: var(--disabled-color); color: #9e9e9e; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-success { background-color: var(--success-color); color: white; }
+
+        /* --- Status and Preview --- */
+        #status-area {
+            margin-top: 1.5rem; padding: 1rem; background-color: #f8f9fa; border: 1px solid var(--border-color);
+            border-radius: 8px; text-align: left; font-family: 'Menlo', 'monospace'; font-size: 0.9rem;
+            max-height: 150px; overflow-y: auto; white-space: pre-wrap; word-wrap: break-word;
+        }
+        
+        #preview-container { margin-top: 2rem; }
+        #preview-container h2 { font-size: 1.2rem; font-weight: 500; color: var(--label-color); margin-bottom: 1rem; }
+        #slide-previews {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem; max-height: 60vh; overflow-y: auto; padding: 1rem;
+            background-color: #e9ecef; border-radius: 8px;
+        }
+        .slide-container {
+            background-color: white; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            /* This is a 16:9 aspect ratio holder */
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            position: relative;
+        }
+        .pptx-viewer-wrapper {
+             /* PptxJs will target this with fixed position, so we wrap it */
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
+
+        #download-area { margin-top: 1.5rem; }
+        .hidden { display: none; }
+        
+        @media (max-width: 600px) {
+            .container { padding: 1.5rem; }
+            header h1 { font-size: 1.5rem; }
+            #slide-previews { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>PPTX to PDF Converter</h1>
+            <p>Convert your PowerPoint (.pptx) files into a PDF, right in your browser.</p>
+        </header>
+
+        <main>
+            <div id="upload-area" class="upload-area">
+                <input type="file" id="pptx-upload" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation">
+                <label for="pptx-upload">Click to choose a file or drag it here</label>
+                <p id="file-name">No file selected</p>
+            </div>
+
+            <button id="convert-btn" class="btn btn-primary" disabled>Convert to PDF</button>
+            
+            <div id="status-area" class="hidden" role="status" aria-live="polite"></div>
+            
+            <div id="preview-container" class="hidden">
+                <h2>Slide Preview</h2>
+                <div id="slide-previews"></div>
+            </div>
+
+            <div id="download-area" class="hidden">
+                <a href="#" id="download-link" class="btn btn-success" download>Download PDF File</a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        'use strict';
+        
+        // Expose jsPDF from its UMD module structure
+        const { jsPDF } = window.jspdf;
+
+        // DOM Elements
+        const uploadArea = document.getElementById('upload-area');
+        const pptxUpload = document.getElementById('pptx-upload');
+        const fileNameDisplay = document.getElementById('file-name');
+        const convertBtn = document.getElementById('convert-btn');
+        const statusArea = document.getElementById('status-area');
+        const previewContainer = document.getElementById('preview-container');
+        const slidePreviews = document.getElementById('slide-previews');
+        const downloadArea = document.getElementById('download-area');
+        const downloadLink = document.getElementById('download-link');
+
+        let selectedFile = null;
+        let originalFileName = '';
+
+        // --- File Input and Drag-and-Drop ---
+        uploadArea.addEventListener('click', () => pptxUpload.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+        });
+        pptxUpload.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) handleFile(e.target.files[0]);
+        });
+
+        function handleFile(file) {
+            const validExtensions = ['.pptx'];
+            const isValid = file && validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+            
+            if (isValid) {
+                selectedFile = file;
+                originalFileName = file.name.replace(/\.pptx$/i, '');
+                fileNameDisplay.textContent = file.name;
+                convertBtn.disabled = false;
+                // Reset UI for new conversion
+                statusArea.classList.add('hidden');
+                previewContainer.classList.add('hidden');
+                downloadArea.classList.add('hidden');
+            } else {
+                alert('Please select a valid .pptx file.');
+                selectedFile = null;
+                fileNameDisplay.textContent = 'No file selected';
+                convertBtn.disabled = true;
+            }
+        }
+
+        // --- Core Conversion Process ---
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            // Update UI for processing state
+            convertBtn.disabled = true;
+            statusArea.classList.remove('hidden');
+            statusArea.textContent = '';
+            previewContainer.classList.add('hidden');
+            downloadArea.classList.add('hidden');
+            slidePreviews.innerHTML = '';
+            
+            logStatus('Starting conversion...');
+
+            try {
+                // 1. Read PPTX file and render slides
+                await renderPptxSlides();
+
+                // 2. Generate PDF from the rendered slides
+                await generatePdfFromSlides();
+
+            } catch (error) {
+                console.error('Error during conversion:', error);
+                logStatus(`An error occurred: ${error.message}\nConversion failed.`);
+                convertBtn.disabled = false; // Allow user to try again
+            }
+        });
+
+        async function renderPptxSlides() {
+            logStatus('Reading file and preparing to render slides...');
+            previewContainer.classList.remove('hidden');
+            
+            // pptx-js requires a specific setup
+            $("#slide-previews").pptxToHtml({
+                pptxFileUrl: selectedFile,
+                fileInputId: "pptx-upload",
+                slideMode: false,
+                keyBoardShortCut: false,
+                mediaProcess: false, // Turn off for faster conversion
+                callback: function(slides) {
+                    logStatus(`Successfully rendered ${slides.total} slides.`);
+                }
+            });
+            
+            // We need to wait for the library to finish rendering.
+            // A common way is to poll for the result.
+            return new Promise((resolve, reject) => {
+                let checkInterval = setInterval(() => {
+                    const renderedSlides = document.querySelectorAll('.slide-container');
+                    if (renderedSlides.length > 0) {
+                        // Check if the library has finished setting the total slide count
+                        const totalSlidesStr = document.querySelector(".slide-options .total-slides");
+                        if(totalSlidesStr && parseInt(totalSlidesStr.innerText) === renderedSlides.length) {
+                            clearInterval(checkInterval);
+                            resolve();
+                        }
+                    }
+                }, 500);
+
+                setTimeout(() => { // Timeout to prevent infinite loops
+                    clearInterval(checkInterval);
+                    if(document.querySelectorAll('.slide-container').length === 0) {
+                       reject(new Error('Slide rendering timed out. The file might be complex or invalid.'));
+                    } else {
+                       resolve(); // Resolve even if total count isn't perfect
+                    }
+                }, 30000); // 30-second timeout
+            });
+        }
+        
+        async function generatePdfFromSlides() {
+            logStatus('All slides rendered. Now generating PDF...');
+            const slideElements = document.querySelectorAll('.slide-container');
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4' // Standard A4 landscape
+            });
+
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            for (let i = 0; i < slideElements.length; i++) {
+                const slide = slideElements[i];
+                logStatus(`Capturing slide ${i + 1} of ${slideElements.length}...`);
+
+                const canvas = await html2canvas(slide, {
+                    scale: 2, // Use a higher scale for better resolution
+                    logging: false,
+                    useCORS: true,
+                });
+                
+                const imgData = canvas.toDataURL('image/png');
+
+                // Add a new page for each slide except the first one
+                if (i > 0) {
+                    pdf.addPage();
+                }
+                
+                // Add the image to the PDF, fitting it to the page
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            }
+
+            logStatus('PDF generation complete! Preparing download...');
+
+            // Create a download link
+            const pdfBlob = pdf.output('blob');
+            downloadLink.href = URL.createObjectURL(pdfBlob);
+            downloadLink.download = `${originalFileName}.pdf`;
+            
+            downloadArea.classList.remove('hidden');
+            convertBtn.disabled = false; // Allow for another conversion
+        }
+        
+        function logStatus(message) {
+            console.log(message);
+            statusArea.innerHTML += message + '\n';
+            statusArea.scrollTop = statusArea.scrollHeight;
+        }
+
+    </script>
+</body>
+</html>
