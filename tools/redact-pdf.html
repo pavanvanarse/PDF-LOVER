@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Redact PDF – Securely Black Out Text & Images Online</title>
+    <meta name="description" content="Redact sensitive text or areas from PDF files securely in your browser — no upload, no server, 100% privacy-safe.">
+
+    <!-- Libraries from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #333333; /* Redaction color */
+            --danger-color: #d9534f;
+            --success-color: #5cb85c;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #212529;
+            --label-color: #6c757d;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+        }
+
+        /* --- General Setup --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .main-card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            padding: 2rem;
+        }
+        
+        header h1 { font-size: 1.8rem; font-weight: 600; text-align: center; margin-bottom: 0.5rem; }
+        header p { font-size: 1rem; color: var(--label-color); text-align: center; margin-bottom: 2rem; }
+        header .instructions {
+            background-color: #fffbe6;
+            border: 1px solid #fde086;
+            color: #78350f;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        /* --- File Upload Area --- */
+        #upload-area {
+            border: 3px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #upload-area:hover, #upload-area.dragover {
+            border-color: var(--danger-color);
+            background-color: #fffafa;
+        }
+        #upload-area input[type="file"] { display: none; }
+        #upload-area label { font-weight: 500; color: var(--danger-color); cursor: pointer; }
+        #file-name { margin-top: 1rem; font-weight: 500; color: var(--label-color); }
+        
+        /* --- PDF Viewer --- */
+        #viewer-container {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .page-container {
+            position: relative;
+            background-color: white;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            border-radius: 4px;
+        }
+        .page-container .render-canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            z-index: 1;
+        }
+        .page-container .redaction-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            cursor: crosshair;
+        }
+        
+        /* --- Action Buttons --- */
+        #actions {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .btn {
+            padding: 0.8rem 1.5rem; border: none; border-radius: 8px;
+            font-size: 1.1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+        .btn-success { background-color: var(--success-color); color: white; }
+        .btn:disabled { background-color: #ced4da; color: #6c757d; cursor: not-allowed; }
+        
+        #status-area { margin-top: 1rem; font-weight: 500; min-height: 24px; text-align: center; }
+        .hidden { display: none; }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 600px) {
+            body { padding: 1rem; }
+            .main-card { padding: 1.5rem; }
+            header h1 { font-size: 1.5rem; }
+            #actions { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="main-card">
+            <header>
+                <h1>Secure PDF Redactor</h1>
+                <p>Black out sensitive information before sharing your documents.</p>
+            </header>
+
+            <main>
+                <div id="upload-area">
+                    <input type="file" id="pdf-upload" accept=".pdf">
+                    <label for="pdf-upload">Click to choose a file or drag it here</label>
+                    <p id="file-name">No file selected</p>
+                </div>
+
+                <div id="editor-section" class="hidden">
+                    <div class="instructions">
+                        <strong>Instructions:</strong> Click and drag on the pages below to draw redaction boxes. The changes are permanent in the downloaded file.
+                    </div>
+                    <div id="viewer-container"></div>
+                    <div id="actions">
+                        <button id="reset-btn" class="btn btn-danger">Reset Redactions</button>
+                        <button id="download-btn" class="btn btn-success">Apply & Download Redacted PDF</button>
+                    </div>
+                    <p id="status-area"></p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+        
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
+        const { PDFDocument, rgb } = PDFLib;
+
+        // DOM Elements
+        const uploadArea = document.getElementById('upload-area');
+        const pdfUpload = document.getElementById('pdf-upload');
+        const fileNameDisplay = document.getElementById('file-name');
+        const editorSection = document.getElementById('editor-section');
+        const viewerContainer = document.getElementById('viewer-container');
+        const resetBtn = document.getElementById('reset-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const statusArea = document.getElementById('status-area');
+        
+        // App State
+        let originalFile = null;
+        let redactionRects = {}; // { pageNum: [ {x, y, width, height} ] }
+
+        // --- File Handling ---
+        uploadArea.addEventListener('click', () => pdfUpload.click());
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFileUpload(e.dataTransfer.files[0]);
+        });
+        pdfUpload.addEventListener('change', (e) => handleFileUpload(e.target.files[0]));
+        
+        async function handleFileUpload(file) {
+            if (!file || file.type !== 'application/pdf') {
+                alert('Please upload a valid PDF file.');
+                return;
+            }
+            originalFile = file;
+            fileNameDisplay.textContent = file.name;
+            statusArea.textContent = 'Loading PDF...';
+            resetUI();
+            
+            const fileReader = new FileReader();
+            fileReader.onload = async (event) => {
+                const pdfData = new Uint8Array(event.target.result);
+                const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
+                await renderAllPages(pdfDoc);
+                editorSection.classList.remove('hidden');
+                statusArea.textContent = '';
+            };
+            fileReader.readAsArrayBuffer(file);
+        }
+
+        function resetUI() {
+            viewerContainer.innerHTML = '';
+            redactionRects = {};
+            editorSection.classList.add('hidden');
+        }
+
+        // --- PDF Rendering & Redaction Drawing ---
+        async function renderAllPages(pdfDoc) {
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                const page = await pdfDoc.getPage(i);
+                const viewport = page.getViewport({ scale: 1.5 });
+
+                const pageContainer = document.createElement('div');
+                pageContainer.className = 'page-container';
+                pageContainer.style.width = `${viewport.width}px`;
+                pageContainer.style.height = `${viewport.height}px`;
+
+                // Render Canvas
+                const renderCanvas = document.createElement('canvas');
+                renderCanvas.className = 'render-canvas';
+                renderCanvas.width = viewport.width;
+                renderCanvas.height = viewport.height;
+                
+                // Redaction Canvas (Overlay)
+                const redactionCanvas = document.createElement('canvas');
+                redactionCanvas.className = 'redaction-canvas';
+                redactionCanvas.width = viewport.width;
+                redactionCanvas.height = viewport.height;
+                redactionCanvas.dataset.pageNum = i;
+                
+                pageContainer.append(renderCanvas, redactionCanvas);
+                viewerContainer.appendChild(pageContainer);
+                
+                const renderContext = { canvasContext: renderCanvas.getContext('2d'), viewport };
+                await page.render(renderContext).promise;
+                
+                setupRedactionEvents(redactionCanvas);
+            }
+        }
+
+        function setupRedactionEvents(canvas) {
+            let isDrawing = false;
+            let startX, startY;
+            const ctx = canvas.getContext('2d');
+
+            canvas.addEventListener('mousedown', (e) => {
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                startX = e.clientX - rect.left;
+                startY = e.clientY - rect.top;
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const currentX = e.clientX - rect.left;
+                const currentY = e.clientY - rect.top;
+                
+                // Clear and redraw all rects on this page for live preview
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawRectsOnPage(canvas.dataset.pageNum);
+                
+                // Draw the current rectangle being drawn
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(startX, startY, currentX - startX, currentY - startY);
+            });
+
+            canvas.addEventListener('mouseup', (e) => {
+                if (!isDrawing) return;
+                isDrawing = false;
+                const rect = canvas.getBoundingClientRect();
+                const endX = e.clientX - rect.left;
+                const endY = e.clientY - rect.top;
+                
+                const pageNum = canvas.dataset.pageNum;
+                if (!redactionRects[pageNum]) {
+                    redactionRects[pageNum] = [];
+                }
+                
+                redactionRects[pageNum].push({
+                    x: Math.min(startX, endX),
+                    y: Math.min(startY, endY),
+                    width: Math.abs(endX - startX),
+                    height: Math.abs(endY - startY),
+                });
+                
+                drawRectsOnPage(pageNum); // Final draw
+            });
+        }
+        
+        function drawRectsOnPage(pageNum) {
+            const canvas = document.querySelector(`.redaction-canvas[data-page-num="${pageNum}"]`);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (redactionRects[pageNum]) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+                redactionRects[pageNum].forEach(rect => {
+                    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+                });
+            }
+        }
+        
+        resetBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to remove all redaction marks?')) {
+                redactionRects = {};
+                document.querySelectorAll('.redaction-canvas').forEach(canvas => {
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                });
+            }
+        });
+
+        // --- PDF Export (pdf-lib) ---
+        downloadBtn.addEventListener('click', async () => {
+            if (!originalFile) return;
+
+            statusArea.textContent = 'Applying redactions... Please wait.';
+            downloadBtn.disabled = true;
+
+            try {
+                const existingPdfBytes = await originalFile.arrayBuffer();
+                const pdfDoc = await PDFDocument.load(existingPdfBytes);
+                const pages = pdfDoc.getPages();
+
+                for (const pageNum in redactionRects) {
+                    const page = pages[pageNum - 1];
+                    const { width: pageWidth, height: pageHeight } = page.getSize();
+                    const canvas = document.querySelector(`.redaction-canvas[data-page-num="${pageNum}"]`);
+                    
+                    const scaleX = pageWidth / canvas.width;
+                    const scaleY = pageHeight / canvas.height;
+
+                    redactionRects[pageNum].forEach(rect => {
+                        page.drawRectangle({
+                            x: rect.x * scaleX,
+                            y: pageHeight - (rect.y * scaleY) - (rect.height * scaleY),
+                            width: rect.width * scaleX,
+                            height: rect.height * scaleY,
+                            color: rgb(0, 0, 0),
+                        });
+                    });
+                }
+
+                const pdfBytes = await pdfDoc.save();
+                downloadFile(pdfBytes, `${originalFile.name.replace(/\.pdf$/i, '')}-redacted.pdf`);
+                statusArea.textContent = 'Redaction complete! Your file is downloading.';
+
+            } catch (error) {
+                console.error("Error redacting PDF:", error);
+                statusArea.textContent = 'An error occurred during redaction.';
+            } finally {
+                downloadBtn.disabled = false;
+            }
+        });
+
+        function downloadFile(data, fileName) {
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+    </script>
+</body>
+</html>
