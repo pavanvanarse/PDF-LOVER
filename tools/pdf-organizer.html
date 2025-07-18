@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Organizer - Rearrange, Delete, Rotate & Duplicate PDF Pages Online</title>
+    <meta name="description" content="Free online PDF organizer tool. Rearrange, delete, rotate, and duplicate PDF pages with drag-and-drop interface. Live preview, instant download. 100% secure client-side processing.">
+    <meta name="keywords" content="PDF organizer, rearrange PDF pages, delete PDF pages, rotate PDF, duplicate PDF pages, online PDF editor">
+    <meta name="author" content="PDF Tools">
+    <meta name="robots" content="index, follow">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #2ec4b6;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --light: #f8f9ff;
+            --dark: #2b2d42;
+            --gray: #8d99ae;
+            --border-radius: 16px;
+            --border-radius-sm: 8px;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.18);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 16px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .upload-area {
+            border: 3px dashed var(--primary);
+            border-radius: var(--border-radius);
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            background: var(--light);
+            transition: var(--transition);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            transition: var(--transition);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .upload-area:hover::before,
+        .upload-area.dragover::before {
+            width: 500px;
+            height: 500px;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: var(--secondary);
+            background: #f0f2ff;
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .upload-text {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .upload-subtext {
+            color: var(--gray);
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .toolbar {
+            display: none;
+            background: var(--light);
+            padding: 20px;
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .toolbar-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .toolbar-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .toolbar-section {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #26a69a 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #e0a800 100%);
+            color: var(--dark);
+        }
+
+        .btn:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .file-info {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .file-info h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+            font-size: 1.2rem;
+        }
+
+        .file-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .file-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .file-detail span:first-child {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .file-detail span:last-child {
+            color: var(--gray);
+        }
+
+        .pages-container {
+            display: none;
+        }
+
+        .pages-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .pages-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .pages-stats {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--primary);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            background: var(--light);
+            border-radius: var(--border-radius);
+            border: 2px solid #e1e5e9;
+            min-height: 300px;
+        }
+
+        .page-item {
+            position: relative;
+            background: white;
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+            cursor: move;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            user-select: none;
+        }
+
+        .page-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .page-item.selected {
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+
+        .page-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+            z-index: 1000;
+        }
+
+        .page-preview {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+        }
+
+        .page-canvas {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: var(--border-radius-sm);
+        }
+
+        .page-controls {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .page-item:hover .page-controls {
+            opacity: 1;
+        }
+
+        .page-control-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-control-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .rotate-btn {
+            background: var(--warning);
+            color: var(--dark);
+        }
+
+        .duplicate-btn {
+            background: var(--success);
+            color: white;
+        }
+
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+        }
+
+        .page-info {
+            padding: 12px;
+            text-align: center;
+            background: white;
+        }
+
+        .page-number {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .page-rotation {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .checkbox-container {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 10;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .drag-placeholder {
+            border: 3px dashed var(--primary);
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .progress-container {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e1e5e9;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: var(--border-radius-sm);
+            margin: 15px 0;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .message-success {
+            background: rgba(46, 196, 182, 0.15);
+            border: 1px solid #2ec4b6;
+            color: #13897d;
+        }
+
+        .message-error {
+            background: rgba(231, 29, 54, 0.1);
+            border: 1px solid #f07c9d;
+            color: #c32649;
+        }
+
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 8px 12px;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+            
+            header {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .pages-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .toolbar-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .toolbar-section {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .pages-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            
+            .page-item {
+                height: auto;
+            }
+            
+            .page-preview {
+                height: 150px;
+            }
+        }
+
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+    <!-- PDF.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Sortable.js for drag and drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PDF Organizer</h1>
+            <p class="subtitle">Rearrange, delete, rotate, and duplicate PDF pages with an intuitive drag-and-drop interface</p>
+        </header>
+
+        <main class="main-content">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">Drop your PDF here</div>
+                <div class="upload-subtext">or click to browse files</div>
+                <input type="file" id="fileInput" class="file-input" accept="application/pdf" aria-label="Upload PDF file">
+            </div>
+
+            <div class="message message-error" id="errorMessage" role="alert"></div>
+            <div class="message message-success" id="successMessage" role="alert"></div>
+
+            <div class="file-info" id="fileInfo">
+                <h3>📋 File Information</h3>
+                <div class="file-details">
+                    <div class="file-detail">
+                        <span>Name:</span>
+                        <span id="fileName"></span>
+                    </div>
+                    <div class="file-detail">
+                        <span>Size:</span>
+                        <span id="fileSize"></span>
+                    </div>
+                    <div class="file-detail">
+                        <span>Total Pages:</span>
+                        <span id="totalPages"></span>
+                    </div>
+                    <div class="file-detail">
+                        <span>Status:</span>
+                        <span id="fileStatus"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Processing...</div>
+            </div>
+
+            <div class="toolbar" id="toolbar">
+                <div class="toolbar-row">
+                    <div class="toolbar-section">
+                        <button class="btn btn-primary tooltip" id="selectAllBtn" data-tooltip="Select all pages" aria-label="Select all pages">
+                            <span>✓</span>
+                            <span>Select All</span>
+                        </button>
+                        <button class="btn btn-primary tooltip" id="deselectAllBtn" data-tooltip="Deselect all pages" aria-label="Deselect all pages">
+                            <span>✗</span>
+                            <span>Deselect All</span>
+                        </button>
+                    </div>
+                    <div class="toolbar-section">
+                        <button class="btn btn-warning tooltip" id="rotateSelectedBtn" data-tooltip="Rotate selected pages 90° clockwise" aria-label="Rotate selected pages">
+                            <span>🔄</span>
+                            <span>Rotate Selected</span>
+                        </button>
+                        <button class="btn btn-success tooltip" id="duplicateSelectedBtn" data-tooltip="Duplicate selected pages" aria-label="Duplicate selected pages">
+                            <span>📑</span>
+                            <span>Duplicate Selected</span>
+                        </button>
+                        <button class="btn btn-danger tooltip" id="deleteSelectedBtn" data-tooltip="Delete selected pages" aria-label="Delete selected pages">
+                            <span>🗑️</span>
+                            <span>Delete Selected</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="toolbar-row">
+                    <div class="toolbar-section">
+                        <button class="btn btn-success tooltip" id="downloadBtn" data-tooltip="Download organized PDF" aria-label="Download PDF">
+                            <span>💾</span>
+                            <span>Download PDF</span>
+                        </button>
+                        <button class="btn btn-primary tooltip" id="resetBtn" data-tooltip="Reset to original order" aria-label="Reset pages">
+                            <span>🔄</span>
+                            <span>Reset</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pages-container" id="pagesContainer">
+                <div class="pages-header">
+                    <h2 class="pages-title">📖 PDF Pages</h2>
+                    <div class="pages-stats">
+                        <div class="stat-item" id="currentPagesCount">0 pages</div>
+                        <div class="stat-item" id="selectedCount">0 selected</div>
+                    </div>
+                </div>
+                <div class="pages-grid" id="pagesGrid"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        class PDFOrganizer {
+            constructor() {
+                this.pdfDoc = null;
+                this.selectedFile = null;
+                this.pages = [];
+                this.selectedPages = new Set();
+                this.nextPageId = 1;
+                
+                this.initializeElements();
+                this.attachEventListeners();
+                this.initializeDragAndDrop();
+            }
+
+            initializeElements() {
+                // Upload elements
+                this.uploadArea = document.getElementById('uploadArea');
+                this.fileInput = document.getElementById('fileInput');
+                
+                // Info elements
+                this.fileInfo = document.getElementById('fileInfo');
+                this.fileName = document.getElementById('fileName');
+                this.fileSize = document.getElementById('fileSize');
+                this.totalPages = document.getElementById('totalPages');
+                this.fileStatus = document.getElementById('fileStatus');
+                
+                // Progress elements
+                this.progressContainer = document.getElementById('progressContainer');
+                this.progressFill = document.getElementById('progressFill');
+                this.progressText = document.getElementById('progressText');
+                
+                // Pages elements
+                this.toolbar = document.getElementById('toolbar');
+                this.pagesContainer = document.getElementById('pagesContainer');
+                this.pagesGrid = document.getElementById('pagesGrid');
+                this.currentPagesCount = document.getElementById('currentPagesCount');
+                this.selectedCount = document.getElementById('selectedCount');
+                
+                // Button elements
+                this.selectAllBtn = document.getElementById('selectAllBtn');
+                this.deselectAllBtn = document.getElementById('deselectAllBtn');
+                this.rotateSelectedBtn = document.getElementById('rotateSelectedBtn');
+                this.duplicateSelectedBtn = document.getElementById('duplicateSelectedBtn');
+                this.deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+                this.downloadBtn = document.getElementById('downloadBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                
+                // Message elements
+                this.errorMessage = document.getElementById('errorMessage');
+                this.successMessage = document.getElementById('successMessage');
+            }
+
+            attachEventListeners() {
+                // File upload
+                this.uploadArea.addEventListener('click', () => this.fileInput.click());
+                this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+                
+                // Drag and drop
+                this.uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
+                this.uploadArea.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+                this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
+                
+                // Toolbar buttons
+                this.selectAllBtn.addEventListener('click', () => this.selectAllPages());
+                this.deselectAllBtn.addEventListener('click', () => this.deselectAllPages());
+                this.rotateSelectedBtn.addEventListener('click', () => this.rotateSelectedPages());
+                this.duplicateSelectedBtn.addEventListener('click', () => this.duplicateSelectedPages());
+                this.deleteSelectedBtn.addEventListener('click', () => this.deleteSelectedPages());
+                this.downloadBtn.addEventListener('click', () => this.downloadPDF());
+                this.resetBtn.addEventListener('click', () => this.resetPages());
+            }
+
+            initializeDragAndDrop() {
+                this.sortable = Sortable.create(this.pagesGrid, {
+                    animation: 200,
+                    ghostClass: 'page-item-ghost',
+                    chosenClass: 'page-item-chosen',
+                    dragClass: 'dragging',
+                    onStart: () => {
+                        this.pagesGrid.classList.add('dragging-active');
+                    },
+                    onEnd: () => {
+                        this.pagesGrid.classList.remove('dragging-active');
+                        this.updatePageOrder();
+                    }
+                });
+            }
+
+            handleDragOver(e) {
+                e.preventDefault();
+                this.uploadArea.classList.add('dragover');
+            }
+
+            handleDragLeave(e) {
+                e.preventDefault();
+                this.uploadArea.classList.remove('dragover');
+            }
+
+            handleDrop(e) {
+                e.preventDefault();
+                this.uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    this.handleFile(files[0]);
+                }
+            }
+
+            handleFileSelect(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    this.handleFile(file);
+                }
+            }
+
+            handleFile(file) {
+                this.hideMessages();
+                
+                if (file.type !== 'application/pdf') {
+                    this.showError('Please select a PDF file.');
+                    return;
+                }
+
+                if (file.size > 200 * 1024 * 1024) { // 200MB limit
+                    this.showError('File size must be less than 200MB.');
+                    return;
+                }
+
+                this.selectedFile = file;
+                this.loadPDF(file);
+            }
+
+            async loadPDF(file) {
+                try {
+                    this.showProgress(0, 'Loading PDF...');
+                    this.displayFileInfo(file);
+                    
+                    const arrayBuffer = await file.arrayBuffer();
+                    this.pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    
+                    this.updateFileInfo();
+                    
+                    this.showProgress(30, 'Generating page thumbnails...');
+                    await this.generatePages();
+                    
+                    this.showProgress(100, 'PDF loaded successfully!');
+                    
+                    setTimeout(() => {
+                        this.hideProgress();
+                        this.fileStatus.textContent = 'Ready';
+                        this.toolbar.style.display = 'block';
+                        this.pagesContainer.style.display = 'block';
+                        this.updateStats();
+                        this.showSuccess('PDF loaded successfully! You can now organize your pages.');
+                    }, 500);
+                    
+                } catch (error) {
+                    console.error('PDF loading error:', error);
+                    this.hideProgress();
+                    this.showError('Error loading PDF. Please make sure the file is valid and not corrupted.');
+                }
+            }
+
+            displayFileInfo(file) {
+                this.fileName.textContent = file.name;
+                this.fileSize.textContent = this.formatFileSize(file.size);
+                this.fileStatus.textContent = 'Processing...';
+                this.fileInfo.style.display = 'block';
+            }
+
+            updateFileInfo() {
+                this.totalPages.textContent = this.pdfDoc.numPages;
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            async generatePages() {
+                this.pages = [];
+                this.pagesGrid.innerHTML = '';
+                
+                for (let i = 1; i <= this.pdfDoc.numPages; i++) {
+                    const progress = 30 + (i / this.pdfDoc.numPages) * 60;
+                    this.showProgress(progress, `Generating page ${i}/${this.pdfDoc.numPages}...`);
+                    
+                    const page = await this.pdfDoc.getPage(i);
+                    const pageData = {
+                        id: this.nextPageId++,
+                        originalNumber: i,
+                        currentNumber: i,
+                        rotation: 0,
+                        canvas: await this.renderPageToCanvas(page)
+                    };
+                    
+                    this.pages.push(pageData);
+                    this.createPageElement(pageData);
+                }
+            }
+
+            async renderPageToCanvas(page, rotation = 0) {
+                const scale = 0.5;
+                const viewport = page.getViewport({ scale, rotation });
+                
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                await page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                }).promise;
+                
+                return canvas;
+            }
+
+            createPageElement(pageData) {
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'page-item';
+                pageDiv.dataset.pageId = pageData.id;
+                
+                // Checkbox for selection
+                const checkboxContainer = document.createElement('div');
+                checkboxContainer.className = 'checkbox-container';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.addEventListener('change', () => this.togglePageSelection(pageData.id));
+                checkboxContainer.appendChild(checkbox);
+                
+                // Page preview
+                const preview = document.createElement('div');
+                preview.className = 'page-preview';
+                const canvas = pageData.canvas.cloneNode();
+                canvas.className = 'page-canvas';
+                canvas.getContext('2d').drawImage(pageData.canvas, 0, 0);
+                preview.appendChild(canvas);
+                
+                // Page controls
+                const controls = document.createElement('div');
+                controls.className = 'page-controls';
+                
+                const rotateBtn = document.createElement('button');
+                rotateBtn.className = 'page-control-btn rotate-btn tooltip';
+                rotateBtn.innerHTML = '🔄';
+                rotateBtn.setAttribute('data-tooltip', 'Rotate 90°');
+                rotateBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.rotatePage(pageData.id);
+                });
+                
+                const duplicateBtn = document.createElement('button');
+                duplicateBtn.className = 'page-control-btn duplicate-btn tooltip';
+                duplicateBtn.innerHTML = '📑';
+                duplicateBtn.setAttribute('data-tooltip', 'Duplicate page');
+                duplicateBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.duplicatePage(pageData.id);
+                });
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'page-control-btn delete-btn tooltip';
+                deleteBtn.innerHTML = '🗑️';
+                deleteBtn.setAttribute('data-tooltip', 'Delete page');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.deletePage(pageData.id);
+                });
+                
+                controls.appendChild(rotateBtn);
+                controls.appendChild(duplicateBtn);
+                controls.appendChild(deleteBtn);
+                
+                // Page info
+                const info = document.createElement('div');
+                info.className = 'page-info';
+                const pageNumber = document.createElement('div');
+                pageNumber.className = 'page-number';
+                pageNumber.textContent = `Page ${pageData.currentNumber}`;
+                const pageRotation = document.createElement('div');
+                pageRotation.className = 'page-rotation';
+                pageRotation.textContent = pageData.rotation ? `Rotated ${pageData.rotation}°` : 'Original';
+                info.appendChild(pageNumber);
+                info.appendChild(pageRotation);
+                
+                pageDiv.appendChild(checkboxContainer);
+                pageDiv.appendChild(preview);
+                pageDiv.appendChild(controls);
+                pageDiv.appendChild(info);
+                
+                this.pagesGrid.appendChild(pageDiv);
+            }
+
+            togglePageSelection(pageId) {
+                if (this.selectedPages.has(pageId)) {
+                    this.selectedPages.delete(pageId);
+                } else {
+                    this.selectedPages.add(pageId);
+                }
+                this.updateStats();
+            }
+
+            selectAllPages() {
+                this.selectedPages.clear();
+                this.pages.forEach(page => this.selectedPages.add(page.id));
+                this.updateCheckboxes();
+                this.updateStats();
+            }
+
+            deselectAllPages() {
+                this.selectedPages.clear();
+                this.updateCheckboxes();
+                this.updateStats();
+            }
+
+            updateCheckboxes() {
+                const checkboxes = this.pagesGrid.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach((checkbox, index) => {
+                    if (index < this.pages.length) {
+                        checkbox.checked = this.selectedPages.has(this.pages[index].id);
+                    }
+                });
+            }
+
+            async rotatePage(pageId) {
+                const pageData = this.pages.find(p => p.id === pageId);
+                if (!pageData) return;
+                
+                pageData.rotation = (pageData.rotation + 90) % 360;
+                
+                // Re-render the page with new rotation
+                const page = await this.pdfDoc.getPage(pageData.originalNumber);
+                pageData.canvas = await this.renderPageToCanvas(page, pageData.rotation);
+                
+                this.updatePageElement(pageData);
+            }
+
+            async rotateSelectedPages() {
+                if (this.selectedPages.size === 0) {
+                    this.showError('Please select pages to rotate.');
+                    return;
+                }
+                
+                for (const pageId of this.selectedPages) {
+                    await this.rotatePage(pageId);
+                }
+                
+                this.showSuccess(`Rotated ${this.selectedPages.size} page(s) by 90°.`);
+            }
+
+            duplicatePage(pageId) {
+                const pageIndex = this.pages.findIndex(p => p.id === pageId);
+                if (pageIndex === -1) return;
+                
+                const originalPage = this.pages[pageIndex];
+                const duplicatedPage = {
+                    id: this.nextPageId++,
+                    originalNumber: originalPage.originalNumber,
+                    currentNumber: originalPage.currentNumber,
+                    rotation: originalPage.rotation,
+                    canvas: originalPage.canvas.cloneNode()
+                };
+                
+                // Copy canvas content
+                duplicatedPage.canvas.getContext('2d').drawImage(originalPage.canvas, 0, 0);
+                
+                this.pages.splice(pageIndex + 1, 0, duplicatedPage);
+                this.refreshPagesDisplay();
+                this.updateStats();
+            }
+
+            duplicateSelectedPages() {
+                if (this.selectedPages.size === 0) {
+                    this.showError('Please select pages to duplicate.');
+                    return;
+                }
+                
+                // Sort selected pages by their current order to maintain sequence
+                const sortedPageIds = Array.from(this.selectedPages).sort((a, b) => {
+                    const indexA = this.pages.findIndex(p => p.id === a);
+                    const indexB = this.pages.findIndex(p => p.id === b);
+                    return indexA - indexB;
+                });
+                
+                // Duplicate in reverse order to maintain relative positions
+                for (let i = sortedPageIds.length - 1; i >= 0; i--) {
+                    this.duplicatePage(sortedPageIds[i]);
+                }
+                
+                this.showSuccess(`Duplicated ${sortedPageIds.length} page(s).`);
+            }
+
+            deletePage(pageId) {
+                const pageIndex = this.pages.findIndex(p => p.id === pageId);
+                if (pageIndex === -1) return;
+                
+                if (this.pages.length === 1) {
+                    this.showError('Cannot delete the last remaining page.');
+                    return;
+                }
+                
+                this.pages.splice(pageIndex, 1);
+                this.selectedPages.delete(pageId);
+                this.refreshPagesDisplay();
+                this.updateStats();
+            }
+
+            deleteSelectedPages() {
+                if (this.selectedPages.size === 0) {
+                    this.showError('Please select pages to delete.');
+                    return;
+                }
+                
+                if (this.selectedPages.size === this.pages.length) {
+                    this.showError('Cannot delete all pages. At least one page must remain.');
+                    return;
+                }
+                
+                const deletedCount = this.selectedPages.size;
+                
+                // Remove selected pages
+                this.pages = this.pages.filter(page => !this.selectedPages.has(page.id));
+                this.selectedPages.clear();
+                
+                this.refreshPagesDisplay();
+                this.updateStats();
+                this.showSuccess(`Deleted ${deletedCount} page(s).`);
+            }
+
+            updatePageOrder() {
+                // Get the new order based on DOM elements
+                const pageElements = Array.from(this.pagesGrid.children);
+                const newOrder = [];
+                
+                pageElements.forEach(element => {
+                    const pageId = parseInt(element.dataset.pageId);
+                    const pageData = this.pages.find(p => p.id === pageId);
+                    if (pageData) {
+                        newOrder.push(pageData);
+                    }
+                });
+                
+                this.pages = newOrder;
+                this.updatePageNumbers();
+            }
+
+            updatePageElement(pageData) {
+                const pageElement = this.pagesGrid.querySelector(`[data-page-id="${pageData.id}"]`);
+                if (!pageElement) return;
+                
+                // Update canvas
+                const canvas = pageElement.querySelector('.page-canvas');
+                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                canvas.width = pageData.canvas.width;
+                canvas.height = pageData.canvas.height;
+                canvas.getContext('2d').drawImage(pageData.canvas, 0, 0);
+                
+                // Update rotation display
+                const rotationDisplay = pageElement.querySelector('.page-rotation');
+                rotationDisplay.textContent = pageData.rotation ? `Rotated ${pageData.rotation}°` : 'Original';
+            }
+
+            refreshPagesDisplay() {
+                this.pagesGrid.innerHTML = '';
+                this.pages.forEach((pageData, index) => {
+                    pageData.currentNumber = index + 1;
+                    this.createPageElement(pageData);
+                });
+                this.updateCheckboxes();
+            }
+
+            updatePageNumbers() {
+                this.pages.forEach((pageData, index) => {
+                    pageData.currentNumber = index + 1;
+                    const pageElement = this.pagesGrid.querySelector(`[data-page-id="${pageData.id}"]`);
+                    if (pageElement) {
+                        const pageNumber = pageElement.querySelector('.page-number');
+                        pageNumber.textContent = `Page ${pageData.currentNumber}`;
+                    }
+                });
+            }
+
+            resetPages() {
+                if (!this.pdfDoc) return;
+                
+                // Reset to original order
+                this.pages.sort((a, b) => a.originalNumber - b.originalNumber);
+                
+                // Remove duplicates and reset rotations
+                const originalPages = [];
+                const seenOriginals = new Set();
+                
+                this.pages.forEach(page => {
+                    if (!seenOriginals.has(page.originalNumber)) {
+                        page.rotation = 0;
+                        originalPages.push(page);
+                        seenOriginals.add(page.originalNumber);
+                    }
+                });
+                
+                this.pages = originalPages;
+                this.selectedPages.clear();
+                
+                // Re-render all pages without rotation
+                this.regeneratePages();
+            }
+
+            async regeneratePages() {
+                this.showProgress(0, 'Resetting pages...');
+                
+                for (let i = 0; i < this.pages.length; i++) {
+                    const pageData = this.pages[i];
+                    const progress = (i / this.pages.length) * 100;
+                    this.showProgress(progress, `Resetting page ${i + 1}/${this.pages.length}...`);
+                    
+                    const page = await this.pdfDoc.getPage(pageData.originalNumber);
+                    pageData.canvas = await this.renderPageToCanvas(page, 0);
+                }
+                
+                this.refreshPagesDisplay();
+                this.updateStats();
+                this.hideProgress();
+                this.showSuccess('Pages reset to original order and rotation.');
+            }
+
+            async downloadPDF() {
+                if (!this.pages.length) {
+                    this.showError('No pages to download.');
+                    return;
+                }
+                
+                try {
+                    this.showProgress(0, 'Preparing PDF...');
+                    
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF();
+                    
+                    // Remove default page
+                    pdf.deletePage(1);
+                    
+                    for (let i = 0; i < this.pages.length; i++) {
+                        const pageData = this.pages[i];
+                        const progress = (i / this.pages.length) * 100;
+                        this.showProgress(progress, `Processing page ${i + 1}/${this.pages.length}...`);
+                        
+                        // Get high-resolution version
+                        const page = await this.pdfDoc.getPage(pageData.originalNumber);
+                        const canvas = await this.renderPageToCanvas(page, pageData.rotation);
+                        
+                        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                        const pageWidth = canvas.width / 2;
+                        const pageHeight = canvas.height / 2;
+                        
+                        pdf.addPage([pageWidth, pageHeight]);
+                        pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+                    }
+                    
+                    this.showProgress(100, 'Finalizing PDF...');
+                    
+                    setTimeout(() => {
+                        const fileName = this.selectedFile.name.replace('.pdf', '_organized.pdf');
+                        pdf.save(fileName);
+                        
+                        this.hideProgress();
+                        this.showSuccess('PDF downloaded successfully!');
+                    }, 500);
+                    
+                } catch (error) {
+                    console.error('PDF generation error:', error);
+                    this.hideProgress();
+                    this.showError('Error generating PDF. Please try again.');
+                }
+            }
+
+            updateStats() {
+                this.currentPagesCount.textContent = `${this.pages.length} pages`;
+                this.selectedCount.textContent = `${this.selectedPages.size} selected`;
+            }
+
+            showProgress(percent, text) {
+                this.progressContainer.style.display = 'block';
+                this.progressFill.style.width = Math.min(percent, 100) + '%';
+                this.progressText.textContent = text;
+            }
+
+            hideProgress() {
+                this.progressContainer.style.display = 'none';
+            }
+
+            showError(message) {
+                this.hideMessages();
+                this.errorMessage.textContent = message;
+                this.errorMessage.style.display = 'block';
+                this.errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => this.errorMessage.style.display = 'none', 5000);
+            }
+
+            showSuccess(message) {
+                this.hideMessages();
+                this.successMessage.textContent = message;
+                this.successMessage.style.display = 'block';
+                this.successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => this.successMessage.style.display = 'none', 5000);
+            }
+
+            hideMessages() {
+                this.errorMessage.style.display = 'none';
+                this.successMessage.style.display = 'none';
+            }
+        }
+
+        // Initialize the PDF Organizer when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new PDFOrganizer();
+        });
+    </script>
+</body>
+</html>
