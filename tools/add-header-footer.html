@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Add Header & Footer to PDF – Free Online Tool</title>
+    <meta name="description" content="Easily add custom headers and footers to your PDF files. Adjust text, font size, alignment, and margins with a live preview. 100% free and browser-based.">
+
+    <!-- Libraries from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success-color: #16a34a;
+            --background-color: #f1f3f6;
+            --card-background: #ffffff;
+            --text-color: #1f2937;
+            --label-color: #4b5563;
+            --border-color: #d1d5db;
+            --disabled-color: #e5e7eb;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+        }
+
+        /* --- General Setup --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        /* --- Main Layout --- */
+        .app-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* --- Controls Panel --- */
+        .controls {
+            background-color: var(--card-background);
+            box-shadow: 2px 0 15px var(--shadow-color);
+            padding: 1.5rem;
+            overflow-y: auto;
+            z-index: 10;
+        }
+        .controls-header h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .controls-header p { font-size: 0.9rem; color: var(--label-color); margin-bottom: 2rem; }
+        
+        .control-section { margin-bottom: 1.5rem; }
+        .control-section h3 {
+            font-size: 1rem; font-weight: 500; color: var(--label-color);
+            margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;
+        }
+
+        /* Form Elements */
+        label { display: block; font-weight: 500; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        input[type="text"], input[type="number"], select {
+            width: 100%; padding: 0.6rem; border: 1px solid var(--border-color);
+            border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 0.9rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus, select:focus {
+            outline: none; border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: end; }
+        
+        /* Buttons */
+        .btn {
+            width: 100%; padding: 0.8rem; border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:disabled { background-color: var(--disabled-color); color: #9ca3af; cursor: not-allowed; }
+        .btn-success { background-color: var(--success-color); color: white; }
+
+        /* --- Preview Area --- */
+        .preview-area {
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+        }
+        #page-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1000px;
+        }
+        
+        .page-container {
+            position: relative;
+            background-color: white;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .page-container canvas { display: block; width: 100%; height: auto; }
+        
+        /* Live Preview Overlays */
+        .header-overlay, .footer-overlay {
+            position: absolute; left: 20px; right: 20px;
+            color: black; opacity: 0.8;
+            font-family: Helvetica, Arial, sans-serif;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .header-overlay { top: 20px; }
+        .footer-overlay { bottom: 20px; }
+
+        /* --- Initial Upload Screen --- */
+        #upload-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 100; backdrop-filter: blur(5px);
+            padding: 2rem;
+        }
+        .upload-box {
+            background: white; padding: 2rem; border-radius: 12px; text-align: center;
+            border: 3px dashed var(--border-color); transition: all 0.3s ease;
+            max-width: 500px;
+        }
+        .upload-box.dragover { border-color: var(--primary-color); transform: scale(1.02); }
+        #pdf-upload { display: none; }
+        
+        #status-area { margin-top: 1.5rem; font-weight: 500; min-height: 24px; }
+        .hidden { display: none; }
+        
+        /* --- Responsive Design --- */
+        @media (max-width: 1024px) {
+            .app-container { grid-template-columns: 1fr; }
+            .controls { position: sticky; top: 0; z-index: 10; }
+            .preview-area { padding: 1.5rem; }
+            #page-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="upload-overlay">
+        <div class="upload-box">
+            <h1>Add Header & Footer to PDF</h1>
+            <p>Drag & drop your PDF file here or click to select a file. All processing is done securely in your browser.</p>
+            <input type="file" id="pdf-upload" accept=".pdf">
+            <button class="btn btn-primary" onclick="document.getElementById('pdf-upload').click()">Choose File</button>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Controls Panel -->
+        <aside class="controls">
+            <div class="controls-header">
+                <h1>Settings</h1>
+                <p>Use {page} and {total} in your text.</p>
+            </div>
+            
+            <div class="control-section">
+                <h3>Header</h3>
+                <label for="header-text">Text</label>
+                <input type="text" id="header-text" placeholder="e.g., Document Title - {page}/{total}">
+            </div>
+
+            <div class="control-section">
+                <h3>Footer</h3>
+                <label for="footer-text">Text</label>
+                <input type="text" id="footer-text" placeholder="e.g., Confidential">
+            </div>
+
+            <div class="control-section">
+                <h3>Formatting</h3>
+                <div class="input-group">
+                    <div>
+                        <label for="font-size">Font Size</label>
+                        <input type="number" id="font-size" value="12" min="1">
+                    </div>
+                    <div>
+                        <label for="alignment">Alignment</label>
+                        <select id="alignment">
+                            <option value="left">Left</option>
+                            <option value="center" selected>Center</option>
+                            <option value="right">Right</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <label for="margin">Margin (from edge)</label>
+                    <input type="number" id="margin" value="30" min="1">
+                </div>
+            </div>
+
+            <button id="process-btn" class="btn btn-primary" disabled>Apply & Download</button>
+            <div id="status-area"></div>
+        </aside>
+
+        <!-- Preview Area -->
+        <main class="preview-area">
+            <div id="page-grid"></div>
+        </main>
+    </div>
+
+    <script>
+        'use strict';
+        
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
+        const { PDFDocument, rgb, StandardFonts } = PDFLib;
+
+        // DOM Elements
+        const uploadOverlay = document.getElementById('upload-overlay');
+        const uploadBox = document.querySelector('.upload-box');
+        const pdfUpload = document.getElementById('pdf-upload');
+        const pageGrid = document.getElementById('page-grid');
+        const processBtn = document.getElementById('process-btn');
+        const statusArea = document.getElementById('status-area');
+        
+        const controls = {
+            headerText: document.getElementById('header-text'),
+            footerText: document.getElementById('footer-text'),
+            fontSize: document.getElementById('font-size'),
+            alignment: document.getElementById('alignment'),
+            margin: document.getElementById('margin'),
+        };
+
+        // App State
+        let uploadedFile = null;
+        let pdfDoc = null;
+        let totalPages = 0;
+
+        // --- File Handling ---
+        pdfUpload.addEventListener('change', (e) => handleFileUpload(e.target.files[0]));
+        uploadBox.addEventListener('dragover', (e) => { e.preventDefault(); uploadBox.classList.add('dragover'); });
+        uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('dragover'));
+        uploadBox.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadBox.classList.remove('dragover');
+            handleFileUpload(e.dataTransfer.files[0]);
+        });
+        
+        async function handleFileUpload(file) {
+            if (!file || file.type !== 'application/pdf') {
+                alert('Please upload a valid PDF file.');
+                return;
+            }
+            uploadedFile = file;
+            uploadOverlay.classList.add('hidden');
+            statusArea.textContent = 'Loading PDF...';
+            
+            const fileReader = new FileReader();
+            fileReader.onload = async (event) => {
+                const pdfData = new Uint8Array(event.target.result);
+                pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
+                totalPages = pdfDoc.numPages;
+                pageGrid.innerHTML = '';
+                await renderAllPages();
+                processBtn.disabled = false;
+                statusArea.textContent = 'PDF loaded. Adjust settings as needed.';
+            };
+            fileReader.readAsArrayBuffer(file);
+        }
+
+        // --- Live Preview ---
+        Object.values(controls).forEach(input => {
+            input.addEventListener('input', updateLivePreviews);
+        });
+
+        function updateLivePreviews() {
+            const settings = getSettings();
+            document.querySelectorAll('.page-container').forEach((container, index) => {
+                const pageNum = index + 1;
+                const headerOverlay = container.querySelector('.header-overlay');
+                const footerOverlay = container.querySelector('.footer-overlay');
+
+                // Update Header
+                headerOverlay.textContent = settings.headerText.replace('{page}', pageNum).replace('{total}', totalPages);
+                headerOverlay.style.fontSize = `${settings.fontSize * 0.75}px`; // Scale for preview
+                headerOverlay.style.textAlign = settings.alignment;
+                headerOverlay.style.top = `${settings.margin * 0.5}px`;
+
+                // Update Footer
+                footerOverlay.textContent = settings.footerText.replace('{page}', pageNum).replace('{total}', totalPages);
+                footerOverlay.style.fontSize = `${settings.fontSize * 0.75}px`;
+                footerOverlay.style.textAlign = settings.alignment;
+                footerOverlay.style.bottom = `${settings.margin * 0.5}px`;
+            });
+        }
+        
+        async function renderAllPages() {
+            for (let i = 1; i <= totalPages; i++) {
+                await renderPage(i);
+            }
+            updateLivePreviews(); // Initial update
+        }
+
+        async function renderPage(pageNum) {
+            const page = await pdfDoc.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 1 });
+            
+            const container = document.createElement('div');
+            container.className = 'page-container';
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
+            const headerOverlay = document.createElement('div');
+            headerOverlay.className = 'header-overlay';
+
+            const footerOverlay = document.createElement('div');
+            footerOverlay.className = 'footer-overlay';
+            
+            container.append(canvas, headerOverlay, footerOverlay);
+            pageGrid.appendChild(container);
+            
+            const renderContext = { canvasContext: canvas.getContext('2d'), viewport };
+            await page.render(renderContext).promise;
+        }
+
+        // --- PDF Processing ---
+        function getSettings() {
+            return {
+                headerText: controls.headerText.value,
+                footerText: controls.footerText.value,
+                fontSize: parseInt(controls.fontSize.value, 10),
+                alignment: controls.alignment.value,
+                margin: parseInt(controls.margin.value, 10),
+            };
+        }
+
+        processBtn.addEventListener('click', async () => {
+            if (!uploadedFile) return;
+
+            statusArea.textContent = 'Processing... This may take a moment.';
+            processBtn.disabled = true;
+
+            try {
+                const settings = getSettings();
+                const existingPdfBytes = await uploadedFile.arrayBuffer();
+                const pdfLibDoc = await PDFDocument.load(existingPdfBytes);
+                const font = await pdfLibDoc.embedFont(StandardFonts.Helvetica);
+                const pages = pdfLibDoc.getPages();
+
+                for (let i = 0; i < pages.length; i++) {
+                    const page = pages[i];
+                    const { width, height } = page.getSize();
+                    const pageNum = i + 1;
+                    
+                    // Header Text
+                    if (settings.headerText) {
+                        const text = settings.headerText.replace('{page}', pageNum).replace('{total}', totalPages);
+                        const textWidth = font.widthOfTextAtSize(text, settings.fontSize);
+                        let x;
+                        if (settings.alignment === 'center') x = (width - textWidth) / 2;
+                        else if (settings.alignment === 'right') x = width - textWidth - settings.margin;
+                        else x = settings.margin;
+                        
+                        page.drawText(text, { x, y: height - settings.margin, font, size: settings.fontSize, color: rgb(0, 0, 0) });
+                    }
+                    
+                    // Footer Text
+                    if (settings.footerText) {
+                        const text = settings.footerText.replace('{page}', pageNum).replace('{total}', totalPages);
+                        const textWidth = font.widthOfTextAtSize(text, settings.fontSize);
+                        let x;
+                        if (settings.alignment === 'center') x = (width - textWidth) / 2;
+                        else if (settings.alignment === 'right') x = width - textWidth - settings.margin;
+                        else x = settings.margin;
+
+                        page.drawText(text, { x, y: settings.margin, font, size: settings.fontSize, color: rgb(0, 0, 0) });
+                    }
+                }
+
+                const pdfBytes = await pdfLibDoc.save();
+                downloadFile(pdfBytes, `${uploadedFile.name.replace(/\.pdf$/i, '')}-modified.pdf`, 'application/pdf');
+                statusArea.textContent = 'Processing complete!';
+
+            } catch (error) {
+                console.error(error);
+                statusArea.textContent = 'An error occurred. Please try again.';
+            } finally {
+                processBtn.disabled = false;
+            }
+        });
+        
+        function downloadFile(data, fileName, mimeType) {
+            const blob = new Blob([data], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
