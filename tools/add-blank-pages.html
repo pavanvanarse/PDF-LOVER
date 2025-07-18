@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Add Blank Pages to PDF – Free Online Tool</title>
+    <meta name="description" content="Easily insert blank pages into any PDF document for free. Choose to add pages before or after any existing page. Secure, browser-based, and no uploads required.">
+
+    <!-- Libraries from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --success-color: #16a34a;
+            --background-color: #f3f4f6;
+            --card-background: #ffffff;
+            --text-color: #1f2937;
+            --label-color: #4b5563;
+            --border-color: #d1d5db;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+        }
+
+        /* --- General Setup --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .main-card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            padding: 2rem;
+        }
+        
+        header h1 { font-size: 1.8rem; font-weight: 600; text-align: center; margin-bottom: 0.5rem; }
+        header p { font-size: 1rem; color: var(--label-color); text-align: center; margin-bottom: 2rem; }
+
+        /* --- File Upload Area --- */
+        .upload-area {
+            border: 3px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary-color);
+            background-color: #fafbfe;
+        }
+        .upload-area input[type="file"] { display: none; }
+        .upload-area label { font-weight: 500; color: var(--primary-color); cursor: pointer; }
+        #file-name { margin-top: 1rem; font-weight: 500; color: var(--label-color); }
+
+        /* --- Page List --- */
+        #page-list-container { margin-top: 2rem; }
+        #page-list { list-style: none; }
+        
+        .page-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background-color: #f9fafb;
+            border: 1px solid var(--border-color);
+        }
+        
+        .page-preview canvas {
+            width: 80px;
+            height: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .page-info { flex-grow: 1; }
+        .page-info .page-number { font-weight: 600; font-size: 1.1rem; }
+        .page-info .page-dimensions { font-size: 0.8rem; color: var(--label-color); }
+        
+        .page-actions { display: flex; flex-direction: column; gap: 0.5rem; }
+        .insert-btn {
+            background: none; border: 1px solid var(--primary-color);
+            color: var(--primary-color); padding: 0.4rem 0.8rem; border-radius: 6px;
+            font-size: 0.8rem; font-weight: 500; cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .insert-btn:hover { background-color: var(--primary-color); color: white; }
+        
+        /* --- Download Button --- */
+        .download-section { margin-top: 2rem; text-align: center; }
+        .btn-success {
+            background-color: var(--success-color); color: white;
+            padding: 0.8rem 1.5rem; border: none; border-radius: 8px;
+            font-size: 1.1rem; font-weight: 600; cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .btn-success:hover { transform: translateY(-2px); }
+
+        #status-area { margin-top: 1rem; font-weight: 500; min-height: 24px; text-align: center; }
+        .hidden { display: none; }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 600px) {
+            body { padding: 1rem; }
+            .main-card { padding: 1.5rem; }
+            .page-item { flex-direction: column; text-align: center; }
+            .page-actions { flex-direction: row; margin-top: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="main-card">
+            <header>
+                <h1>Add Blank Pages to PDF</h1>
+                <p>Upload your PDF, then choose where to insert new blank pages.</p>
+            </header>
+
+            <main>
+                <div id="upload-area" class="upload-area">
+                    <input type="file" id="pdf-upload" accept=".pdf">
+                    <label for="pdf-upload">Click to choose a file or drag it here</label>
+                    <p id="file-name">No file selected</p>
+                </div>
+
+                <div id="page-list-container" class="hidden">
+                    <ul id="page-list">
+                        <!-- Page items will be dynamically inserted here -->
+                    </ul>
+                </div>
+                
+                <div id="download-section" class="download-section hidden">
+                    <button id="process-btn" class="btn-success">Process & Download PDF</button>
+                    <p id="status-area"></p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+        
+        // Setup for libraries
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
+        const { PDFDocument, PageSizes } = PDFLib;
+
+        // DOM Elements
+        const uploadArea = document.getElementById('upload-area');
+        const pdfUpload = document.getElementById('pdf-upload');
+        const fileNameDisplay = document.getElementById('file-name');
+        const pageListContainer = document.getElementById('page-list-container');
+        const pageList = document.getElementById('page-list');
+        const downloadSection = document.getElementById('download-section');
+        const processBtn = document.getElementById('process-btn');
+        const statusArea = document.getElementById('status-area');
+        
+        // App State
+        let pdfDoc = null;
+        let originalFile = null;
+        let insertionQueue = []; // { index: number, count: number }
+
+        // --- File Handling ---
+        uploadArea.addEventListener('click', () => pdfUpload.click());
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFileUpload(e.dataTransfer.files[0]);
+        });
+        pdfUpload.addEventListener('change', (e) => {
+            handleFileUpload(e.target.files[0]);
+        });
+        
+        async function handleFileUpload(file) {
+            if (!file || file.type !== 'application/pdf') {
+                alert('Please upload a valid PDF file.');
+                return;
+            }
+            originalFile = file;
+            fileNameDisplay.textContent = file.name;
+            statusArea.textContent = 'Loading PDF...';
+            resetUI();
+            
+            const fileReader = new FileReader();
+            fileReader.onload = async (event) => {
+                const pdfData = new Uint8Array(event.target.result);
+                pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
+                await renderAllPages();
+                pageListContainer.classList.remove('hidden');
+                downloadSection.classList.remove('hidden');
+                statusArea.textContent = '';
+            };
+            fileReader.readAsArrayBuffer(file);
+        }
+
+        function resetUI() {
+            pageList.innerHTML = '';
+            insertionQueue = [];
+            pageListContainer.classList.add('hidden');
+            downloadSection.classList.add('hidden');
+        }
+
+        // --- PDF Rendering & UI ---
+        async function renderAllPages() {
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                const page = await pdfDoc.getPage(i);
+                const viewport = page.getViewport({ scale: 0.25 }); // Small scale for thumbnails
+
+                const listItem = document.createElement('li');
+                listItem.className = 'page-item';
+                listItem.dataset.pageNum = i;
+
+                // Canvas for preview
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                const canvasContainer = document.createElement('div');
+                canvasContainer.className = 'page-preview';
+                canvasContainer.appendChild(canvas);
+                
+                // Page Info
+                const pageInfoDiv = document.createElement('div');
+                pageInfoDiv.className = 'page-info';
+                pageInfoDiv.innerHTML = `
+                    <div class="page-number">Page ${i}</div>
+                    <div class="page-dimensions">${Math.round(viewport.width * 4)} x ${Math.round(viewport.height * 4)} pts</div>
+                `;
+                
+                // Action Buttons
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'page-actions';
+                const btnBefore = document.createElement('button');
+                btnBefore.className = 'insert-btn';
+                btnBefore.textContent = 'Insert Page Before';
+                btnBefore.onclick = () => addPageToQueue(i - 1);
+                
+                const btnAfter = document.createElement('button');
+                btnAfter.className = 'insert-btn';
+                btnAfter.textContent = 'Insert Page After';
+                btnAfter.onclick = () => addPageToQueue(i);
+                
+                actionsDiv.append(btnBefore, btnAfter);
+                listItem.append(canvasContainer, pageInfoDiv, actionsDiv);
+                pageList.appendChild(listItem);
+                
+                const renderContext = { canvasContext: canvas.getContext('2d'), viewport };
+                await page.render(renderContext).promise;
+            }
+        }
+        
+        function addPageToQueue(index) {
+            const existing = insertionQueue.find(item => item.index === index);
+            if (existing) {
+                existing.count++;
+            } else {
+                insertionQueue.push({ index, count: 1 });
+            }
+            statusArea.textContent = `Queued ${insertionQueue.reduce((sum, item) => sum + item.count, 0)} blank page(s) for insertion.`;
+            console.log("Insertion Queue:", insertionQueue);
+        }
+
+        // --- PDF Processing (pdf-lib) ---
+        processBtn.addEventListener('click', async () => {
+            if (!originalFile || insertionQueue.length === 0) {
+                alert('Please add at least one blank page before processing.');
+                return;
+            }
+
+            statusArea.textContent = 'Processing... Please wait.';
+            processBtn.disabled = true;
+
+            try {
+                const existingPdfBytes = await originalFile.arrayBuffer();
+                const pdfLibDoc = await PDFDocument.load(existingPdfBytes);
+                
+                // Sort queue by index in descending order to avoid messing up indices during insertion.
+                insertionQueue.sort((a, b) => b.index - a.index);
+                
+                for (const item of insertionQueue) {
+                    // Determine page size. Use A4 as default, or size of previous/next page.
+                    const referencePage = pdfLibDoc.getPage(item.index > 0 ? item.index - 1 : 0);
+                    const { width, height } = referencePage.getSize();
+                    
+                    for (let i = 0; i < item.count; i++) {
+                        pdfLibDoc.insertPage(item.index, [width, height]);
+                    }
+                }
+                
+                const pdfBytes = await pdfLibDoc.save();
+                downloadFile(pdfBytes, `${originalFile.name.replace(/\.pdf$/i, '')}-modified.pdf`);
+                statusArea.textContent = 'Processing complete! Your file is downloading.';
+
+            } catch (error) {
+                console.error("Error processing PDF:", error);
+                statusArea.textContent = 'An error occurred during processing.';
+            } finally {
+                processBtn.disabled = false;
+            }
+        });
+
+        function downloadFile(data, fileName) {
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+    </script>
+</body>
+</html>
