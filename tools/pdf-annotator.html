@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Annotator - Draw and Annotate PDF Files Online</title>
+    <meta name="description" content="Free online PDF annotation tool. Draw, highlight, and add shapes to your PDF files with our interactive canvas-based editor.">
+    <meta name="keywords" content="PDF annotator, draw on PDF, highlight PDF, PDF markup, PDF editor">
+    <meta name="author" content="PDF Tools">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content {
+            display: flex;
+            height: calc(100vh - 160px);
+            min-height: 600px;
+        }
+
+        .toolbar {
+            width: 300px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+            border-right: 1px solid #e1e5e9;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .canvas-container {
+            flex: 1;
+            background: #fafbfc;
+            position: relative;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            margin: 40px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .upload-area:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: linear-gradient(135deg, #f0f2ff 0%, #e8ecff 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .upload-text {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .upload-subtext {
+            color: #666;
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .pdf-viewer {
+            display: none;
+            flex: 1;
+            position: relative;
+            background: white;
+            margin: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .viewer-header {
+            background: #f8f9ff;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e1e5e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .page-navigation {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .page-info {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .zoom-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .zoom-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .zoom-value {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+
+        .canvas-stack {
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .pdf-canvas,
+        .annotation-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: crosshair;
+        }
+
+        .pdf-canvas {
+            background: white;
+            z-index: 1;
+        }
+
+        .annotation-canvas {
+            z-index: 2;
+        }
+
+        .tool-section {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .tool-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 5px;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tool-btn {
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tool-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-btn.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tool-icon {
+            font-size: 1.2rem;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .color-btn {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-btn.active {
+            border-color: #333;
+            transform: scale(1.1);
+        }
+
+        .color-btn.active::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .size-control {
+            margin-bottom: 15px;
+        }
+
+        .size-control label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .size-slider {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .size-value {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px;
+            border: 1px solid #f5c6cb;
+            display: none;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px;
+            border: 1px solid #c3e6cb;
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-container {
+            display: none;
+            margin: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e1e5e9;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .toolbar {
+                width: 100%;
+                order: 2;
+                padding: 15px;
+                max-height: 300px;
+            }
+            
+            .canvas-container {
+                order: 1;
+                height: 600px;
+            }
+            
+            .tool-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            header {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                height: auto;
+            }
+
+            .canvas-container {
+                height: 500px;
+            }
+
+            .viewer-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .page-navigation,
+            .zoom-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .tool-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .color-palette {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .upload-area {
+                margin: 20px;
+                padding: 40px 15px;
+            }
+
+            .upload-icon {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .canvas-container {
+                height: 400px;
+            }
+
+            .upload-area {
+                margin: 15px;
+                padding: 30px 10px;
+            }
+
+            .upload-icon {
+                font-size: 2.5rem;
+            }
+
+            .tool-section {
+                padding: 12px;
+            }
+
+            .color-palette {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Touch support */
+        @media (hover: none) {
+            .tool-btn:hover,
+            .color-btn:hover,
+            .nav-btn:hover,
+            .zoom-btn:hover,
+            .btn:hover {
+                transform: none;
+            }
+            
+            .tool-btn:active,
+            .color-btn:active,
+            .nav-btn:active,
+            .zoom-btn:active,
+            .btn:active {
+                transform: scale(0.95);
+            }
+        }
+    </style>
+
+    <!-- PDF.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✏️ PDF Annotator</h1>
+            <p class="subtitle">Draw, highlight, and annotate your PDF files</p>
+        </header>
+
+        <div class="main-content">
+            <div class="toolbar">
+                <div class="tool-section">
+                    <h3>🛠️ Tools</h3>
+                    <div class="tool-grid">
+                        <button class="tool-btn active" data-tool="pen">
+                            <span class="tool-icon">✏️</span>
+                            <span>Pen</span>
+                        </button>
+                        <button class="tool-btn" data-tool="highlighter">
+                            <span class="tool-icon">🖍️</span>
+                            <span>Highlighter</span>
+                        </button>
+                        <button class="tool-btn" data-tool="rectangle">
+                            <span class="tool-icon">▭</span>
+                            <span>Rectangle</span>
+                        </button>
+                        <button class="tool-btn" data-tool="circle">
+                            <span class="tool-icon">⭕</span>
+                            <span>Circle</span>
+                        </button>
+                        <button class="tool-btn" data-tool="arrow">
+                            <span class="tool-icon">➡️</span>
+                            <span>Arrow</span>
+                        </button>
+                        <button class="tool-btn" data-tool="text">
+                            <span class="tool-icon">📝</span>
+                            <span>Text</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tool-section">
+                    <h3>🎨 Colors</h3>
+                    <div class="color-palette">
+                        <button class="color-btn active" data-color="#000000" style="background: #000000;"></button>
+                        <button class="color-btn" data-color="#ff0000" style="background: #ff0000;"></button>
+                        <button class="color-btn" data-color="#00ff00" style="background: #00ff00;"></button>
+                        <button class="color-btn" data-color="#0000ff" style="background: #0000ff;"></button>
+                        <button class="color-btn" data-color="#ffff00" style="background: #ffff00;"></button>
+                        <button class="color-btn" data-color="#ff00ff" style="background: #ff00ff;"></button>
+                        <button class="color-btn" data-color="#00ffff" style="background: #00ffff;"></button>
+                        <button class="color-btn" data-color="#ffffff" style="background: #ffffff;"></button>
+                        <button class="color-btn" data-color="#8b4513" style="background: #8b4513;"></button>
+                        <button class="color-btn" data-color="#ffa500" style="background: #ffa500;"></button>
+                        <button class="color-btn" data-color="#800080" style="background: #800080;"></button>
+                        <button class="color-btn" data-color="#808080" style="background: #808080;"></button>
+                    </div>
+                </div>
+
+                <div class="tool-section">
+                    <h3>📏 Size</h3>
+                    <div class="size-control">
+                        <label for="brushSize">Brush Size:</label>
+                        <input type="range" id="brushSize" class="size-slider" min="1" max="50" value="3">
+                        <span class="size-value" id="brushSizeValue">3px</span>
+                    </div>
+                </div>
+
+                <div class="tool-section">
+                    <h3>⚡ Actions</h3>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" id="undoBtn" disabled>
+                            ↶ Undo
+                        </button>
+                        <button class="btn btn-secondary" id="redoBtn" disabled>
+                            ↷ Redo
+                        </button>
+                        <button class="btn btn-danger" id="clearBtn" disabled>
+                            🗑️ Clear All
+                        </button>
+                        <button class="btn btn-success" id="saveBtn" disabled>
+                            💾 Save PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📄</div>
+                    <div class="upload-text">Drop your PDF here</div>
+                    <div class="upload-subtext">or click to select a file</div>
+                    <input type="file" id="fileInput" class="file-input" accept="application/pdf">
+                </div>
+
+                <div class="pdf-viewer" id="pdfViewer">
+                    <div class="viewer-header">
+                        <div class="page-navigation">
+                            <button class="nav-btn" id="prevBtn" disabled>← Previous</button>
+                            <span class="page-info" id="pageInfo">Page 1 of 1</span>
+                            <button class="nav-btn" id="nextBtn" disabled>Next →</button>
+                        </div>
+                        <div class="zoom-controls">
+                            <button class="zoom-btn" id="zoomOutBtn">-</button>
+                            <span class="zoom-value" id="zoomValue">100%</span>
+                            <button class="zoom-btn" id="zoomInBtn">+</button>
+                            <button class="zoom-btn" id="fitBtn">Fit</button>
+                        </div>
+                    </div>
+                    <div class="canvas-wrapper" id="canvasWrapper">
+                        <div class="canvas-stack" id="canvasStack">
+                            <canvas id="pdfCanvas" class="pdf-canvas"></canvas>
+                            <canvas id="annotationCanvas" class="annotation-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Processing...</div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const pdfViewer = document.getElementById('pdfViewer');
+        const pdfCanvas = document.getElementById('pdfCanvas');
+        const annotationCanvas = document.getElementById('annotationCanvas');
+        const canvasStack = document.getElementById('canvasStack');
+        const canvasWrapper = document.getElementById('canvasWrapper');
+        const pageInfo = document.getElementById('pageInfo');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const zoomInBtn = document.getElementById('zoomInBtn');
+        const zoomOutBtn = document.getElementById('zoomOutBtn');
+        const fitBtn = document.getElementById('fitBtn');
+        const zoomValue = document.getElementById('zoomValue');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+
+        // Tool controls
+        const toolBtns = document.querySelectorAll('.tool-btn');
+        const colorBtns = document.querySelectorAll('.color-btn');
+        const brushSize = document.getElementById('brushSize');
+        const brushSizeValue = document.getElementById('brushSizeValue');
+        const undoBtn = document.getElementById('undoBtn');
+        const redoBtn = document.getElementById('redoBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const saveBtn = document.getElementById('saveBtn');
+
+        // Global variables
+        let pdfDoc = null;
+        let currentPage = 1;
+        let currentTool = 'pen';
+        let currentColor = '#000000';
+        let currentBrushSize = 3;
+        let currentZoom = 1;
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let startX = 0;
+        let startY = 0;
+        let annotations = [];
+        let undoStack = [];
+        let redoStack = [];
+        let pageAnnotations = new Map();
+
+        // Get canvas contexts
+        const pdfCtx = pdfCanvas.getContext('2d');
+        const annotationCtx = annotationCanvas.getContext('2d');
+
+        // Event Listeners
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Navigation
+        prevBtn.addEventListener('click', () => changePage(-1));
+        nextBtn.addEventListener('click', () => changePage(1));
+
+        // Zoom controls
+        zoomInBtn.addEventListener('click', () => changeZoom(0.25));
+        zoomOutBtn.addEventListener('click', () => changeZoom(-0.25));
+        fitBtn.addEventListener('click', fitToWidth);
+
+        // Tool controls
+        toolBtns.forEach(btn => {
+            btn.addEventListener('click', () => selectTool(btn.dataset.tool));
+        });
+
+        colorBtns.forEach(btn => {
+            btn.addEventListener('click', () => selectColor(btn.dataset.color));
+        });
+
+        brushSize.addEventListener('input', updateBrushSize);
+
+        // Action buttons
+        undoBtn.addEventListener('click', undo);
+        redoBtn.addEventListener('click', redo);
+        clearBtn.addEventListener('click', clearAnnotations);
+        saveBtn.addEventListener('click', saveAnnotatedPDF);
+
+        // Canvas drawing events
+        annotationCanvas.addEventListener('mousedown', startDrawing);
+        annotationCanvas.addEventListener('mousemove', draw);
+        annotationCanvas.addEventListener('mouseup', stopDrawing);
+        annotationCanvas.addEventListener('mouseout', stopDrawing);
+
+        // Touch events for mobile
+        annotationCanvas.addEventListener('touchstart', handleTouchStart);
+        annotationCanvas.addEventListener('touchmove', handleTouchMove);
+        annotationCanvas.addEventListener('touchend', handleTouchEnd);
+
+        // File handling
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            if (file.type !== 'application/pdf') {
+                showError('Please select a PDF file.');
+                return;
+            }
+
+            if (file.size > 100 * 1024 * 1024) {
+                showError('File size must be less than 100MB.');
+                return;
+            }
+
+            loadPDF(file);
+        }
+
+        async function loadPDF(file) {
+            try {
+                showProgress(0, 'Loading PDF...');
+                const arrayBuffer = await file.arrayBuffer();
+                
+                showProgress(50, 'Parsing document...');
+                pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                currentPage = 1;
+                pageAnnotations.clear();
+                
+                showProgress(100, 'PDF loaded successfully!');
+                
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    uploadArea.style.display = 'none';
+                    pdfViewer.style.display = 'flex';
+                    renderPage();
+                    enableControls();
+                    showSuccess('PDF loaded successfully! Start annotating with the tools on the left.');
+                }, 500);
+                
+            } catch (error) {
+                console.error('PDF loading error:', error);
+                showError('Error loading PDF. Please make sure the file is valid.');
+                progressContainer.style.display = 'none';
+            }
+        }
+
+        async function renderPage() {
+            if (!pdfDoc) return;
+            
+            try {
+                const page = await pdfDoc.getPage(currentPage);
+                const viewport = page.getViewport({ scale: currentZoom });
+                
+                // Set canvas dimensions
+                pdfCanvas.width = viewport.width;
+                pdfCanvas.height = viewport.height;
+                annotationCanvas.width = viewport.width;
+                annotationCanvas.height = viewport.height;
+                
+                // Update canvas stack size
+                canvasStack.style.width = viewport.width + 'px';
+                canvasStack.style.height = viewport.height + 'px';
+                
+                // Clear canvases
+                pdfCtx.clearRect(0, 0, pdfCanvas.width, pdfCanvas.height);
+                annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+                
+                // Render PDF page
+                await page.render({
+                    canvasContext: pdfCtx,
+                    viewport: viewport
+                }).promise;
+                
+                // Load and render annotations for current page
+                loadPageAnnotations();
+                
+                // Update page info
+                pageInfo.textContent = `Page ${currentPage} of ${pdfDoc.numPages}`;
+                prevBtn.disabled = currentPage === 1;
+                nextBtn.disabled = currentPage === pdfDoc.numPages;
+                
+            } catch (error) {
+                console.error('Page rendering error:', error);
+                showError('Error rendering page.');
+            }
+        }
+
+        // Tool functions
+        function selectTool(tool) {
+            currentTool = tool;
+            
+            // Update UI
+            toolBtns.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tool === tool);
+            });
+            
+            // Update cursor
+            updateCursor();
+        }
+
+        function selectColor(color) {
+            currentColor = color;
+            
+            // Update UI
+            colorBtns.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.color === color);
+            });
+        }
+
+        function updateBrushSize() {
+            currentBrushSize = parseInt(brushSize.value);
+            brushSizeValue.textContent = currentBrushSize + 'px';
+            updateCursor();
+        }
+
+        function updateCursor() {
+            const cursor = currentTool === 'pen' || currentTool === 'highlighter' ? 'crosshair' : 'default';
+            annotationCanvas.style.cursor = cursor;
+        }
+
+        // Drawing functions
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = annotationCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            lastX = x;
+            lastY = y;
+            startX = x;
+            startY = y;
+            
+            // Save state for undo
+            saveState();
+            
+            if (currentTool === 'pen' || currentTool === 'highlighter') {
+                setupDrawingStyle();
+                annotationCtx.beginPath();
+                annotationCtx.moveTo(x, y);
+            }
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            const rect = annotationCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            if (currentTool === 'pen' || currentTool === 'highlighter') {
+                annotationCtx.lineTo(x, y);
+                annotationCtx.stroke();
+                annotationCtx.beginPath();
+                annotationCtx.moveTo(x, y);
+            } else if (currentTool === 'rectangle' || currentTool === 'circle') {
+                // Clear and redraw shape
+                redrawAnnotations();
+                drawShape(startX, startY, x, y);
+            }
+            
+            lastX = x;
+            lastY = y;
+        }
+
+        function stopDrawing(e) {
+            if (!isDrawing) return;
+            isDrawing = false;
+            
+            if (currentTool === 'arrow') {
+                const rect = annotationCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                drawArrow(startX, startY, x, y);
+            } else if (currentTool === 'text') {
+                const rect = annotationCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                addTextAnnotation(x, y);
+            }
+            
+            // Save annotation
+            saveAnnotation();
+            redoStack = [];
+            updateActionButtons();
+        }
+
+        function setupDrawingStyle() {
+            annotationCtx.strokeStyle = currentColor;
+            annotationCtx.lineWidth = currentBrushSize;
+            annotationCtx.lineCap = 'round';
+            annotationCtx.lineJoin = 'round';
+            
+            if (currentTool === 'highlighter') {
+                annotationCtx.globalAlpha = 0.3;
+                annotationCtx.lineWidth = currentBrushSize * 3;
+            } else {
+                annotationCtx.globalAlpha = 1;
+            }
+        }
+
+        function drawShape(startX, startY, endX, endY) {
+            setupDrawingStyle();
+            annotationCtx.beginPath();
+            
+            if (currentTool === 'rectangle') {
+                const width = endX - startX;
+                const height = endY - startY;
+                annotationCtx.rect(startX, startY, width, height);
+            } else if (currentTool === 'circle') {
+                const radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                annotationCtx.arc(startX, startY, radius, 0, 2 * Math.PI);
+            }
+            
+            annotationCtx.stroke();
+        }
+
+        function drawArrow(startX, startY, endX, endY) {
+            setupDrawingStyle();
+            
+            // Draw line
+            annotationCtx.beginPath();
+            annotationCtx.moveTo(startX, startY);
+            annotationCtx.lineTo(endX, endY);
+            annotationCtx.stroke();
+            
+            // Draw arrowhead
+            const angle = Math.atan2(endY - startY, endX - startX);
+            const arrowLength = 20;
+            const arrowAngle = Math.PI / 6;
+            
+            annotationCtx.beginPath();
+            annotationCtx.moveTo(endX, endY);
+            annotationCtx.lineTo(
+                endX - arrowLength * Math.cos(angle - arrowAngle),
+                endY - arrowLength * Math.sin(angle - arrowAngle)
+            );
+            annotationCtx.moveTo(endX, endY);
+            annotationCtx.lineTo(
+                endX - arrowLength * Math.cos(angle + arrowAngle),
+                endY - arrowLength * Math.sin(angle + arrowAngle)
+            );
+            annotationCtx.stroke();
+        }
+
+        function addTextAnnotation(x, y) {
+            const text = prompt('Enter text:');
+            if (text) {
+                setupDrawingStyle();
+                annotationCtx.font = `${currentBrushSize * 4}px Arial`;
+                annotationCtx.fillStyle = currentColor;
+                annotationCtx.fillText(text, x, y);
+            }
+        }
+
+        // Touch handling
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousedown', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            annotationCanvas.dispatchEvent(mouseEvent);
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            annotationCanvas.dispatchEvent(mouseEvent);
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            const mouseEvent = new MouseEvent('mouseup', {});
+            annotationCanvas.dispatchEvent(mouseEvent);
+        }
+
+        // Annotation management
+        function saveAnnotation() {
+            const imageData = annotationCtx.getImageData(0, 0, annotationCanvas.width, annotationCanvas.height);
+            const pageKey = `page_${currentPage}`;
+            
+            if (!pageAnnotations.has(pageKey)) {
+                pageAnnotations.set(pageKey, []);
+            }
+            
+            pageAnnotations.get(pageKey).push({
+                imageData: imageData,
+                timestamp: Date.now()
+            });
+        }
+
+        function loadPageAnnotations() {
+            const pageKey = `page_${currentPage}`;
+            const annotations = pageAnnotations.get(pageKey);
+            
+            if (annotations && annotations.length > 0) {
+                // Load the last annotation for this page
+                const lastAnnotation = annotations[annotations.length - 1];
+                annotationCtx.putImageData(lastAnnotation.imageData, 0, 0);
+            }
+        }
+
+        function redrawAnnotations() {
+            annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+            loadPageAnnotations();
+        }
+
+        function saveState() {
+            const imageData = annotationCtx.getImageData(0, 0, annotationCanvas.width, annotationCanvas.height);
+            undoStack.push({
+                imageData: imageData,
+                page: currentPage
+            });
+            
+            // Limit undo stack size
+            if (undoStack.length > 50) {
+                undoStack.shift();
+            }
+        }
+
+        function undo() {
+            if (undoStack.length > 0) {
+                const currentState = annotationCtx.getImageData(0, 0, annotationCanvas.width, annotationCanvas.height);
+                redoStack.push({
+                    imageData: currentState,
+                    page: currentPage
+                });
+                
+                const previousState = undoStack.pop();
+                if (previousState.page === currentPage) {
+                    annotationCtx.putImageData(previousState.imageData, 0, 0);
+                }
+                
+                updateActionButtons();
+            }
+        }
+
+        function redo() {
+            if (redoStack.length > 0) {
+                const currentState = annotationCtx.getImageData(0, 0, annotationCanvas.width, annotationCanvas.height);
+                undoStack.push({
+                    imageData: currentState,
+                    page: currentPage
+                });
+                
+                const nextState = redoStack.pop();
+                if (nextState.page === currentPage) {
+                    annotationCtx.putImageData(nextState.imageData, 0, 0);
+                }
+                
+                updateActionButtons();
+            }
+        }
+
+        function clearAnnotations() {
+            if (confirm('Are you sure you want to clear all annotations on this page?')) {
+                saveState();
+                annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+                
+                // Clear page annotations
+                const pageKey = `page_${currentPage}`;
+                pageAnnotations.delete(pageKey);
+                
+                updateActionButtons();
+                showSuccess('Annotations cleared for current page.');
+            }
+        }
+
+        function updateActionButtons() {
+            undoBtn.disabled = undoStack.length === 0;
+            redoBtn.disabled = redoStack.length === 0;
+        }
+
+        // Navigation
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            if (newPage >= 1 && newPage <= pdfDoc.numPages) {
+                // Save current page annotations
+                saveAnnotation();
+                
+                currentPage = newPage;
+                renderPage();
+            }
+        }
+
+        // Zoom functions
+        function changeZoom(delta) {
+            currentZoom = Math.max(0.25, Math.min(3, currentZoom + delta));
+            zoomValue.textContent = Math.round(currentZoom * 100) + '%';
+            renderPage();
+        }
+
+        function fitToWidth() {
+            const containerWidth = canvasWrapper.clientWidth - 40;
+            if (pdfDoc) {
+                pdfDoc.getPage(currentPage).then(page => {
+                    const viewport = page.getViewport({ scale: 1 });
+                    currentZoom = containerWidth / viewport.width;
+                    zoomValue.textContent = Math.round(currentZoom * 100) + '%';
+                    renderPage();
+                });
+            }
+        }
+
+        // Save PDF
+        async function saveAnnotatedPDF() {
+            if (!pdfDoc) return;
+            
+            try {
+                showProgress(0, 'Preparing PDF...');
+                
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF();
+                
+                // Remove default page
+                pdf.deletePage(1);
+                
+                for (let i = 1; i <= pdfDoc.numPages; i++) {
+                    const progress = (i / pdfDoc.numPages) * 100;
+                    showProgress(progress, `Processing page ${i}/${pdfDoc.numPages}...`);
+                    
+                    // Render PDF page
+                    const page = await pdfDoc.getPage(i);
+                    const viewport = page.getViewport({ scale: 2 });
+                    
+                    const tempCanvas = document.createElement('canvas');
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCanvas.width = viewport.width;
+                    tempCanvas.height = viewport.height;
+                    
+                    // Render PDF page to temp canvas
+                    await page.render({
+                        canvasContext: tempCtx,
+                        viewport: viewport
+                    }).promise;
+                    
+                    // Add annotations if they exist for this page
+                    const pageKey = `page_${i}`;
+                    const annotations = pageAnnotations.get(pageKey);
+                    
+                    if (annotations && annotations.length > 0) {
+                        // Scale annotations to match PDF resolution
+                        const scaleX = viewport.width / pdfCanvas.width;
+                        const scaleY = viewport.height / pdfCanvas.height;
+                        
+                        const lastAnnotation = annotations[annotations.length - 1];
+                        const scaledCanvas = document.createElement('canvas');
+                        const scaledCtx = scaledCanvas.getContext('2d');
+                        scaledCanvas.width = viewport.width;
+                        scaledCanvas.height = viewport.height;
+                        
+                        // Scale and draw annotations
+                        scaledCtx.scale(scaleX, scaleY);
+                        scaledCtx.putImageData(lastAnnotation.imageData, 0, 0);
+                        
+                        // Composite annotations onto PDF
+                        tempCtx.drawImage(scaledCanvas, 0, 0);
+                    }
+                    
+                    // Add page to PDF
+                    const imgData = tempCanvas.toDataURL('image/jpeg', 0.95);
+                    const pageWidth = viewport.width / 2;
+                    const pageHeight = viewport.height / 2;
+                    
+                    pdf.addPage([pageWidth, pageHeight]);
+                    pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+                }
+                
+                showProgress(100, 'Finalizing PDF...');
+                
+                setTimeout(() => {
+                    pdf.save('annotated_document.pdf');
+                    progressContainer.style.display = 'none';
+                    showSuccess('Annotated PDF saved successfully!');
+                }, 500);
+                
+            } catch (error) {
+                console.error('PDF save error:', error);
+                showError('Error saving PDF. Please try again.');
+                progressContainer.style.display = 'none';
+            }
+        }
+
+        // Utility functions
+        function enableControls() {
+            clearBtn.disabled = false;
+            saveBtn.disabled = false;
+        }
+
+        function showProgress(percent, text) {
+            progressContainer.style.display = 'block';
+            progressFill.style.width = Math.min(percent, 100) + '%';
+            progressText.textContent = text;
+        }
+
+        function showError(message) {
+            hideMessages();
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        function showSuccess(message) {
+            hideMessages();
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        function hideMessages() {
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+        }
+
+        // Initialize
+        updateCursor();
+        updateActionButtons();
+    </script>
+</body>
+</html>
