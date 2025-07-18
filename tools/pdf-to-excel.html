@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Excel Converter</title>
+
+    <!-- Libraries from CDN -->
+    <!-- PDF.js for reading PDF files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <!-- SheetJS (xlsx) for creating Excel files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Google Fonts for a modern look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --primary-hover: #1765c7;
+            --success-color: #1e8e3e;
+            --background-color: #f1f3f4;
+            --card-background: #ffffff;
+            --text-color: #202124;
+            --label-color: #5f6368;
+            --border-color: #dadce0;
+            --disabled-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- General Setup --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            background-color: var(--card-background);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1rem;
+            color: var(--label-color);
+            margin-bottom: 2.5rem;
+        }
+
+        /* --- File Upload Area --- */
+        .upload-area {
+            border: 3px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: border-color 0.3s, background-color 0.3s;
+            cursor: pointer;
+        }
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary-color);
+            background-color: #f8f9fa;
+        }
+        .upload-area input[type="file"] {
+            display: none;
+        }
+        .upload-area label {
+            font-weight: 500;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        .upload-area #file-name {
+            margin-top: 1rem;
+            font-weight: 500;
+            color: var(--label-color);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+        }
+        .btn-primary:disabled {
+            background-color: var(--disabled-color);
+            color: #9e9e9e;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        /* --- Status and Output --- */
+        #status-log {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'Menlo', 'monospace';
+            font-size: 0.9rem;
+            min-height: 100px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        #download-area {
+            margin-top: 1.5rem;
+        }
+
+        .hidden { display: none; }
+        
+        /* --- Responsive Design --- */
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem;
+            }
+            header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>PDF to Excel Converter</h1>
+            <p>Extract tables from your PDF and download them as an XLSX spreadsheet.</p>
+        </header>
+
+        <main>
+            <div id="upload-area" class="upload-area">
+                <input type="file" id="pdf-upload" accept=".pdf" aria-label="Upload PDF file">
+                <label for="pdf-upload">Click to choose a file or drag it here</label>
+                <p id="file-name">No file selected</p>
+            </div>
+
+            <button id="convert-btn" class="btn btn-primary" disabled>Convert to Excel</button>
+            
+            <div id="status-log" class="hidden" role="status" aria-live="polite"></div>
+
+            <div id="download-area" class="hidden">
+                <a href="#" id="download-link" class="btn btn-success" download>Download Excel File</a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        'use strict';
+
+        // Set up PDF.js worker
+        // This is crucial for performance and to avoid errors.
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
+
+        // DOM Elements
+        const uploadArea = document.getElementById('upload-area');
+        const pdfUpload = document.getElementById('pdf-upload');
+        const fileNameDisplay = document.getElementById('file-name');
+        const convertBtn = document.getElementById('convert-btn');
+        const statusLog = document.getElementById('status-log');
+        const downloadArea = document.getElementById('download-area');
+        const downloadLink = document.getElementById('download-link');
+
+        let selectedFile = null;
+        let originalFileName = '';
+
+        // --- Drag and Drop Logic ---
+        uploadArea.addEventListener('click', () => pdfUpload.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        pdfUpload.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (file && file.type === 'application/pdf') {
+                selectedFile = file;
+                originalFileName = file.name.replace(/\.pdf$/i, '');
+                fileNameDisplay.textContent = file.name;
+                convertBtn.disabled = false;
+                statusLog.classList.add('hidden');
+                downloadArea.classList.add('hidden');
+            } else {
+                alert('Please select a valid PDF file.');
+                selectedFile = null;
+                fileNameDisplay.textContent = 'No file selected';
+                convertBtn.disabled = true;
+            }
+        }
+
+        // --- Core Conversion Logic ---
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            convertBtn.disabled = true;
+            statusLog.classList.remove('hidden');
+            statusLog.textContent = 'Starting conversion...';
+            downloadArea.classList.add('hidden');
+
+            try {
+                const arrayBuffer = await selectedFile.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                logStatus('PDF loaded. Processing pages...');
+                const workbook = XLSX.utils.book_new();
+                let tablesFound = 0;
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    logStatus(`Processing page ${i} of ${pdf.numPages}...`);
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    
+                    const table = extractTableFromContent(textContent.items);
+
+                    if (table.length > 0) {
+                        tablesFound++;
+                        const worksheet = XLSX.utils.aoa_to_sheet(table);
+                        XLSX.utils.book_append_sheet(workbook, worksheet, `Page ${i}`);
+                        logStatus(`  -> Found a table on page ${i} with ${table.length} rows.`);
+                    } else {
+                        logStatus(`  -> No table found on page ${i}.`);
+                    }
+                }
+
+                if (tablesFound > 0) {
+                    logStatus(`\nConversion complete. Found tables on ${tablesFound} page(s).`);
+                    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+                    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    
+                    downloadLink.href = URL.createObjectURL(blob);
+                    downloadLink.download = `${originalFileName}.xlsx`;
+                    downloadArea.classList.remove('hidden');
+                } else {
+                    logStatus('\nConversion complete. No tables were found in the PDF.');
+                }
+
+            } catch (error) {
+                console.error('Error during conversion:', error);
+                logStatus(`\nAn error occurred: ${error.message}`);
+            } finally {
+                convertBtn.disabled = false;
+            }
+        });
+
+        /**
+         * The core algorithm to extract a table from PDF.js text items.
+         * It works by grouping text items into rows based on their vertical position.
+         */
+        function extractTableFromContent(items) {
+            const Y_TOLERANCE = 5; // How close items must be vertically to be in the same row
+            const rows = {};
+
+            // 1. Group items into rows based on their Y-coordinate
+            items.forEach(item => {
+                // The transform matrix contains [scaleX, skewY, skewX, scaleY, x, y]
+                const y = item.transform[5];
+                
+                // Find a nearby y-key to group items into the same row
+                const yKey = Object.keys(rows).find(key => Math.abs(key - y) < Y_TOLERANCE);
+                
+                if (yKey) {
+                    rows[yKey].push({ text: item.str, x: item.transform[4] });
+                } else {
+                    rows[y] = [{ text: item.str, x: item.transform[4] }];
+                }
+            });
+
+            if (Object.keys(rows).length === 0) return [];
+
+            // 2. Sort rows by their Y-coordinate (top to bottom)
+            const sortedRowKeys = Object.keys(rows).sort((a, b) => b - a);
+            
+            // 3. For each row, sort its items by X-coordinate (left to right)
+            const processedRows = sortedRowKeys.map(key => {
+                return rows[key]
+                    .sort((a, b) => a.x - b.x)
+                    .map(item => item.text.trim())
+                    // Filter out any empty strings that might result from stray marks in the PDF
+                    .filter(text => text);
+            });
+
+            // 4. Simple heuristics to determine if it's a real table
+            // A "table" should have at least 2 rows and most rows should have more than 1 column
+            const validRows = processedRows.filter(row => row.length > 0);
+            if (validRows.length < 2) return [];
+
+            const multiColumnRows = validRows.filter(row => row.length > 1).length;
+            if (multiColumnRows / validRows.length < 0.5) return []; // Less than half rows are multi-column? Probably not a table.
+            
+            return validRows;
+        }
+
+        function logStatus(message) {
+            console.log(message);
+            statusLog.textContent += (statusLog.textContent ? '\n' : '') + message;
+            // Scroll to the bottom of the log
+            statusLog.scrollTop = statusLog.scrollHeight;
+        }
+
+    </script>
+</body>
+</html>
