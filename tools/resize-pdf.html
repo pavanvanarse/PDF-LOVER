@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Resize PDF – Free Online PDF Page Resizer</title>
+    <meta name="description" content="Change the page size of your PDF documents for free. Select standard sizes like A4, Letter, or enter custom dimensions. Fully browser-based, secure, and easy to use.">
+
+    <!-- Libraries from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #5a67d8;
+            --primary-hover: #4c51bf;
+            --success-color: #38a169;
+            --background-color: #f7fafc;
+            --card-background: #ffffff;
+            --text-color: #2d3748;
+            --label-color: #4a5568;
+            --border-color: #e2e8f0;
+            --disabled-color: #e5e7eb;
+            --shadow-color: rgba(0, 0, 0, 0.07);
+        }
+
+        /* --- General Setup --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        /* --- Main Layout --- */
+        .app-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            min-height: 100vh;
+        }
+
+        /* --- Controls Panel --- */
+        .controls-panel {
+            background-color: var(--card-background);
+            box-shadow: 2px 0 15px var(--shadow-color);
+            padding: 1.5rem;
+            overflow-y: auto;
+            z-index: 10;
+        }
+        .controls-header h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .controls-header p { font-size: 0.9rem; color: var(--label-color); margin-bottom: 2rem; }
+        .control-section { margin-bottom: 1.5rem; }
+
+        /* Form & Input Styles */
+        label { display: block; font-weight: 500; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        select, input[type="number"] {
+            width: 100%; padding: 0.6rem; border: 1px solid var(--border-color);
+            border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 0.9rem;
+            background-color: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus, select:focus {
+            outline: none; border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.2);
+        }
+        #custom-size-inputs { display: grid; grid-template-columns: 1fr 1fr 80px; gap: 0.5rem; }
+
+        /* Button Styles */
+        .btn {
+            width: 100%; padding: 0.8rem; border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover:not(:disabled) { background-color: var(--primary-hover); }
+        .btn:disabled { background-color: var(--disabled-color); color: #a0aec0; cursor: not-allowed; }
+        
+        /* --- Preview Area --- */
+        .preview-area {
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+        }
+        #page-viewer { display: grid; gap: 1.5rem; width: 100%; max-width: 800px; }
+        .page-preview {
+            background-color: white;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            border-radius: 4px;
+        }
+        .page-preview canvas { display: block; width: 100%; height: auto; }
+
+        /* --- Initial Upload Screen --- */
+        #upload-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 100; backdrop-filter: blur(4px); padding: 2rem;
+        }
+        .upload-box {
+            background: white; padding: 2rem; border-radius: 12px; text-align: center;
+            border: 3px dashed var(--border-color); transition: all 0.3s ease;
+            max-width: 500px; box-shadow: 0 5px 20px var(--shadow-color);
+        }
+        .upload-box.dragover { border-color: var(--primary-color); transform: scale(1.02); }
+        #pdf-upload { display: none; }
+        
+        #status-area { margin-top: 1.5rem; font-weight: 500; min-height: 24px; }
+        .hidden { display: none; }
+        
+        /* --- Responsive Design --- */
+        @media (max-width: 1024px) {
+            .app-container { grid-template-columns: 1fr; }
+            .controls-panel { position: sticky; top: 0; z-index: 10; }
+            .preview-area { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="upload-overlay">
+        <div class="upload-box">
+            <h1>Resize PDF Pages</h1>
+            <p>Drag & drop your PDF here or click the button to upload. Change page dimensions easily and securely in your browser.</p>
+            <input type="file" id="pdf-upload" accept=".pdf">
+            <button class="btn btn-primary" onclick="document.getElementById('pdf-upload').click()">Choose File</button>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Controls Panel -->
+        <aside class="controls-panel">
+            <div class="controls-header">
+                <h1>Resize Options</h1>
+                <p>Select a standard size or enter custom dimensions.</p>
+            </div>
+            
+            <div id="resize-controls" class="hidden">
+                <div class="control-section">
+                    <label for="page-size">Page Size</label>
+                    <select id="page-size">
+                        <option value="a4">A4 (210 x 297 mm)</option>
+                        <option value="letter">Letter (8.5 x 11 in)</option>
+                        <option value="legal">Legal (8.5 x 14 in)</option>
+                        <option value="a3">A3 (297 x 420 mm)</option>
+                        <option value="tabloid">Tabloid (11 x 17 in)</option>
+                        <option value="custom">Custom Size</option>
+                    </select>
+                </div>
+
+                <div id="custom-size-inputs" class="control-section hidden">
+                    <label>Width, Height, & Unit</label>
+                    <div>
+                        <input type="number" id="custom-width" placeholder="Width" value="210">
+                        <input type="number" id="custom-height" placeholder="Height" value="297">
+                        <select id="units">
+                            <option value="mm">mm</option>
+                            <option value="in">in</option>
+                            <option value="px">px</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="resize-btn" class="btn btn-primary">Resize & Download</button>
+                <div id="status-area"></div>
+            </div>
+        </aside>
+
+        <!-- Preview Area -->
+        <main class="preview-area">
+            <div id="page-viewer"></div>
+        </main>
+    </div>
+
+    <script>
+        'use strict';
+        
+        // Setup for libraries
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
+        const { jsPDF } = window.jspdf;
+
+        // DOM Elements
+        const uploadOverlay = document.getElementById('upload-overlay');
+        const uploadBox = document.querySelector('.upload-box');
+        const pdfUpload = document.getElementById('pdf-upload');
+        const resizeControls = document.getElementById('resize-controls');
+        const pageViewer = document.getElementById('page-viewer');
+        const pageSizeSelect = document.getElementById('page-size');
+        const customSizeInputs = document.getElementById('custom-size-inputs');
+        const customWidthInput = document.getElementById('custom-width');
+        const customHeightInput = document.getElementById('custom-height');
+        const unitsSelect = document.getElementById('units');
+        const resizeBtn = document.getElementById('resize-btn');
+        const statusArea = document.getElementById('status-area');
+        
+        // App State
+        let pdfDoc = null;
+        let originalFileName = '';
+
+        // Standard paper sizes in points (1pt = 1/72 inch)
+        const standardSizes = {
+            'a4': [595.28, 841.89],
+            'letter': [612, 792],
+            'legal': [612, 1008],
+            'a3': [841.89, 1190.55],
+            'tabloid': [792, 1224]
+        };
+
+        // --- File Handling & UI Toggles ---
+        pdfUpload.addEventListener('change', (e) => handleFileUpload(e.target.files[0]));
+        uploadBox.addEventListener('dragover', (e) => { e.preventDefault(); uploadBox.classList.add('dragover'); });
+        uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('dragover'));
+        uploadBox.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadBox.classList.remove('dragover');
+            handleFileUpload(e.dataTransfer.files[0]);
+        });
+
+        pageSizeSelect.addEventListener('change', () => {
+            customSizeInputs.classList.toggle('hidden', pageSizeSelect.value !== 'custom');
+        });
+        
+        async function handleFileUpload(file) {
+            if (!file || file.type !== 'application/pdf') {
+                alert('Please upload a valid PDF file.');
+                return;
+            }
+            originalFileName = file.name.replace(/\.pdf$/i, '');
+            uploadOverlay.classList.add('hidden');
+            resizeControls.classList.remove('hidden');
+            statusArea.textContent = 'Loading PDF...';
+            
+            const fileReader = new FileReader();
+            fileReader.onload = async (event) => {
+                const pdfData = new Uint8Array(event.target.result);
+                pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
+                pageViewer.innerHTML = '';
+                await renderAllPages();
+                statusArea.textContent = 'PDF loaded. Select a size and convert.';
+            };
+            fileReader.readAsArrayBuffer(file);
+        }
+
+        // --- PDF Rendering (PDF.js) ---
+        async function renderAllPages() {
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                const page = await pdfDoc.getPage(i);
+                const viewport = page.getViewport({ scale: 1.0 });
+
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'page-preview';
+                
+                const canvas = document.createElement('canvas');
+                canvas.dataset.pageNum = i;
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                previewDiv.appendChild(canvas);
+                pageViewer.appendChild(previewDiv);
+                
+                const renderContext = { canvasContext: context, viewport: viewport };
+                await page.render(renderContext).promise;
+            }
+        }
+
+        // --- PDF Resizing (jsPDF) ---
+        resizeBtn.addEventListener('click', async () => {
+            if (!pdfDoc) return;
+            
+            resizeBtn.disabled = true;
+            statusArea.textContent = 'Starting resize process...';
+
+            try {
+                let targetWidth, targetHeight;
+                const size = pageSizeSelect.value;
+
+                if (size === 'custom') {
+                    const width = parseFloat(customWidthInput.value);
+                    const height = parseFloat(customHeightInput.value);
+                    const units = unitsSelect.value;
+                    targetWidth = convertToPoints(width, units);
+                    targetHeight = convertToPoints(height, units);
+                } else {
+                    [targetWidth, targetHeight] = standardSizes[size];
+                }
+
+                const orientation = targetWidth > targetHeight ? 'landscape' : 'portrait';
+                
+                const newPdf = new jsPDF({
+                    orientation: orientation,
+                    unit: 'pt',
+                    format: [targetWidth, targetHeight]
+                });
+
+                for (let i = 1; i <= pdfDoc.numPages; i++) {
+                    statusArea.textContent = `Processing page ${i} of ${pdfDoc.numPages}...`;
+                    const page = await pdfDoc.getPage(i);
+                    const viewport = page.getViewport({ scale: 2.0 }); // Render at high quality
+
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+                    const imgData = canvas.toDataURL('image/png');
+                    
+                    if (i > 1) {
+                        newPdf.addPage([targetWidth, targetHeight], orientation);
+                    }
+                    
+                    // Calculate aspect ratio to fit image on page
+                    const imgProps = newPdf.getImageProperties(imgData);
+                    const pdfPageWidth = newPdf.internal.pageSize.getWidth();
+                    const pdfPageHeight = newPdf.internal.pageSize.getHeight();
+                    
+                    const ratio = Math.min(pdfPageWidth / imgProps.width, pdfPageHeight / imgProps.height);
+                    const imgWidth = imgProps.width * ratio;
+                    const imgHeight = imgProps.height * ratio;
+                    
+                    // Center the image on the page
+                    const x = (pdfPageWidth - imgWidth) / 2;
+                    const y = (pdfPageHeight - imgHeight) / 2;
+                    
+                    newPdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+                }
+                
+                statusArea.textContent = 'Resizing complete. Saving file...';
+                newPdf.save(`${originalFileName}-resized.pdf`);
+
+            } catch (error) {
+                console.error("Error resizing PDF:", error);
+                statusArea.textContent = "An error occurred. Please try again.";
+            } finally {
+                resizeBtn.disabled = false;
+            }
+        });
+
+        // --- Helper Functions ---
+        function convertToPoints(value, unit) {
+            const dpi = 72;
+            if (unit === 'in') {
+                return value * dpi;
+            } else if (unit === 'mm') {
+                return value * (dpi / 25.4);
+            }
+            return value; // Assume px or pt
+        }
+
+    </script>
+</body>
+</html>
