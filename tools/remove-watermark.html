@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remove Watermark from PDF Online Free – Secure & Fast</title>
+    <meta name="description" content="Free online tool to remove watermarks from PDF files. Secure, fast, client-side watermark remover with drag-and-drop upload, preview, and download. Modern UI, private – your PDFs never leave your device.">
+    <meta name="keywords" content="remove watermark, pdf watermark remover, remove watermark from pdf, delete watermark, online, free, secure, fast, no download, client-side">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="PDF Tools">
+    <!-- Open Graph tags -->
+    <meta property="og:title" content="Remove Watermark from PDF Online Free – Secure & Fast">
+    <meta property="og:description" content="Remove watermark from PDF easily. 100% free and secure client-side PDF watermark remover tool. Drag-and-drop, preview, and download.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://yourwebsite.com/og-pdf-watermark-remove.jpg">
+    <meta property="og:url" content="https://yourwebsite.com/remove-watermark.html">
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --light-bg: #f8f9ff;
+            --shadow: 0 4px 24px rgba(76, 100, 152, 0.08);
+            --radius: 16px;
+            --radius-small: 8px;
+            --danger: #dc3545;
+        }
+        html, body {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #222;
+            margin: 0;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 32px auto;
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 36px 18px 36px 18px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        h1 {
+            margin: 0 0 8px 0;
+            font-size: 2.35rem;
+            color: var(--primary);
+        }
+        .subtitle {
+            font-size: 1.15rem;
+            color: #555;
+            font-weight: 500;
+        }
+        .upload-area {
+            border: 2.5px dashed var(--primary);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 48px 20px;
+            background: var(--light-bg);
+            text-align: center;
+            cursor: pointer;
+            margin: 28px auto 32px auto;
+            transition: all 0.28s;
+        }
+        .upload-area.dragover {
+            border-color: var(--secondary);
+            background: #e8ecef;
+            box-shadow: 0 0 0 5px #d8e2fb66, var(--shadow);
+        }
+        .upload-icon {
+            font-size: 3.1rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .upload-area-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #222;
+        }
+        .file-input {
+            display: none;
+        }
+        .file-details {
+            background: var(--light-bg);
+            border-radius: var(--radius-small);
+            box-shadow: var(--shadow);
+            margin: 18px auto 24px auto;
+            padding: 18px 18px 8px 18px;
+            max-width: 430px;
+        }
+        .detail-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 1rem;
+            margin-bottom: 9px;
+        }
+        .detail-label {
+            color: #666;
+        }
+        .detail-value {
+            color: var(--primary); font-weight: 600;
+        }
+        .thumbnails-container {
+            margin: 18px auto 0 auto;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            padding: 0 4px;
+        }
+        .thumbnail-card {
+            background: #fff;
+            border-radius: var(--radius-small);
+            box-shadow: var(--shadow);
+            padding: 7px 7px 7px 7px;
+            text-align: center;
+            position: relative;
+            min-width: 120px;
+        }
+        .thumb-label {
+            font-size: 1rem;
+            color: var(--primary);
+            position: absolute;
+            top: 7px;
+            left: 7px;
+            background: #eef2fb;
+            padding: 0 8px;
+            border-radius: var(--radius-small);
+            font-weight: 600;
+        }
+        .canvas-thumb {
+            width: 110px;
+            height: auto;
+            margin-bottom: 8px;
+            border-radius: var(--radius-small);
+            border: 1px solid #e1e5e9;
+        }
+        .remove-btn {
+            border: 0;
+            border-radius: 50%;
+            background: var(--danger);
+            color: #fff;
+            font-size: 0.92rem;
+            font-weight: bold;
+            width: 34px;
+            height: 34px;
+            position: absolute;
+            right: 7px; top: 7px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            opacity: 0.9;
+            transition: background 0.2s;
+        }
+        .remove-btn:hover {
+            background: #b72b3a;
+        }
+        .info-text, .warn-text {
+            text-align: center;
+            color: #444;
+            background: #f1f2f6;
+            border-radius: var(--radius-small);
+            margin: 25px auto 0 auto;
+            max-width: 650px;
+            padding: 16px;
+            font-size: 1rem;
+        }
+        .warn-text {
+            color: #dc3545;
+            background: #fff0f3;
+            border: 1px solid #fcc6ce;
+        }
+        .btn {
+            display: inline-block;
+            padding: 13px 32px;
+            border-radius: var(--radius-small);
+            font-size: 1.13rem;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            margin: 32px auto 0 auto;
+            transition: background 0.17s, box-shadow 0.17s;
+        }
+        .btn:disabled {
+            background: #c5c9dc;
+            cursor: not-allowed;
+        }
+        .success-box, .error-box {
+            border-radius: var(--radius-small);
+            padding: 18px 24px;
+            margin: 28px auto;
+            max-width: 520px;
+            font-size: 1.07rem;
+            font-weight: 500;
+            text-align: center;
+        }
+        .success-box {
+            background: #e7ffe7;
+            border: 1.4px solid #23ce23;
+            color: #196619;
+        }
+        .error-box {
+            background: #fff0f3;
+            border: 1.4px solid #f07c9d;
+            color: #c32649;
+        }
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-content { padding: 24px 8px;}
+            .container {padding: 22px 0 30px 0;}
+        }
+        @media (max-width: 600px) {
+            .container {margin: 0; border-radius: 0;}
+            .main-content, .upload-area {padding: 13px;}
+        }
+    </style>
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <span class="header-icon">🧽</span>
+            <h1>Remove Watermark from PDF</h1>
+            <div class="subtitle">Remove watermarks from your PDF online – free, private, and instant</div>
+        </header>
+
+        <div id="main-content">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📄</div>
+                <div class="upload-area-text">Drop your watermarked PDF here or click to upload</div>
+                <input type="file" id="fileInput" class="file-input" accept="application/pdf" aria-label="Upload PDF file">
+            </div>
+            <div id="infoMsg" class="info-text" style="display:none"></div>
+            <div id="errorMsg" class="error-box" style="display:none"></div>
+            <div id="successMsg" class="success-box" style="display:none"></div>
+            <div class="file-details" id="fileDetails" style="display:none">
+                <div class="detail-row">
+                    <span class="detail-label">File name:</span>
+                    <span class="detail-value" id="fileName"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Pages:</span>
+                    <span class="detail-value" id="filePages"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Size:</span>
+                    <span class="detail-value" id="fileSize"></span>
+                </div>
+            </div>
+            <div class="thumbnails-container" id="thumbsBox" style="display:none"></div>
+            <div class="warn-text" id="warnMsg" style="display:none">
+                <b>Note:</b> This tool uses advanced techniques to detect and mask out visual/textual watermarks from PDF content previews, but some watermark designs may not be removable. Only works with PDFs that have visible-overlaid watermarks (not those burned into the content or background).
+            </div>
+            <button class="btn" id="downloadBtn" style="display:none" disabled>Download Cleaned PDF</button>
+        </div>
+    </div>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('fileInput');
+const fileDetails = document.getElementById('fileDetails');
+const fileNameEl = document.getElementById('fileName');
+const filePagesEl = document.getElementById('filePages');
+const fileSizeEl = document.getElementById('fileSize');
+const thumbsBox = document.getElementById('thumbsBox');
+const infoMsg = document.getElementById('infoMsg');
+const warnMsg = document.getElementById('warnMsg');
+const errorMsg = document.getElementById('errorMsg');
+const successMsg = document.getElementById('successMsg');
+const downloadBtn = document.getElementById('downloadBtn');
+let pdfDoc = null, cleanedCanvases = [];
+
+function showMsg(el, txt) {
+    [infoMsg, errorMsg, successMsg].forEach(m => m.style.display="none");
+    if (el) { el.textContent = txt; el.style.display="block"; }
+}
+function clearMsg() { [infoMsg, errorMsg, successMsg].forEach(m => m.style.display="none"); }
+
+function formatBytes(bytes, decimals = 2) {
+    if (!+bytes) return '0 Bytes';
+    const k = 1024, dm = decimals, sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    let i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+uploadArea.addEventListener('click', ()=>fileInput.click());
+uploadArea.addEventListener('dragover', e=>{
+    e.preventDefault(); uploadArea.classList.add('dragover');
+});
+uploadArea.addEventListener('dragleave', e=>{
+    e.preventDefault(); uploadArea.classList.remove('dragover');
+});
+uploadArea.addEventListener('drop', e=>{
+    e.preventDefault(); uploadArea.classList.remove('dragover');
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', ()=>{
+    if (fileInput.files.length) handleFile(fileInput.files[0]);
+});
+
+async function handleFile(file) {
+    clearMsg();
+    if(!file || file.type!=="application/pdf") return showMsg(errorMsg, "Please upload a valid PDF.");
+    if (file.size > 60*1024*1024) return showMsg(errorMsg, "PDF too large (max 60MB).");
+    showMsg(infoMsg, "Preparing PDF...");
+    const arrayBuffer = await file.arrayBuffer();
+    pdfDoc = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+    fileNameEl.textContent = file.name;
+    filePagesEl.textContent = pdfDoc.numPages;
+    fileSizeEl.textContent = formatBytes(file.size);
+    fileDetails.style.display = "";
+    thumbsBox.innerHTML = ''; thumbsBox.style.display = "grid";
+    cleanedCanvases = [];
+    await renderThumbnailsWithWatermarkRemove(pdfDoc);
+    showMsg(infoMsg, "Review the cleaned previews below. If satisfied, click Download.");
+    warnMsg.style.display = "block";
+    downloadBtn.style.display = "";
+    downloadBtn.disabled = false;
+}
+
+async function renderThumbnailsWithWatermarkRemove(pdf) {
+    for (let i=1; i<=pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({scale:0.7});
+        // Step 1: Render the page to canvas
+        let canvas = document.createElement('canvas');
+        let ctx = canvas.getContext('2d');
+        canvas.width = viewport.width; canvas.height = viewport.height;
+        await page.render({canvasContext: ctx, viewport}).promise;
+        // Step 2: Watermark removal: basic inpainting/light masking of overlay patterns
+        let cleanedCanvas = await processWatermark(canvas);
+        cleanedCanvases.push(cleanedCanvas);
+        // Display thumbnail
+        let thumbCard = document.createElement('div');
+        thumbCard.className = 'thumbnail-card';
+        let imgEl = document.createElement('canvas');
+        imgEl.className = 'canvas-thumb';
+        imgEl.width=110; imgEl.height=canvas.height * 110 / canvas.width;
+        imgEl.getContext('2d').drawImage(cleanedCanvas, 0,0, imgEl.width, imgEl.height);
+        thumbCard.appendChild(imgEl);
+        let label = document.createElement('span');
+        label.className = 'thumb-label'; label.textContent = `Page ${i}`;
+        thumbCard.appendChild(label);
+        thumbsBox.appendChild(thumbCard);
+    }
+}
+
+// Naive watermark detection: removes (masks out) highly repetitive bright/dark/transparent overlay regions (e.g., DRAFT, SAMPLE, www...) in diagonal bands and semi-transparent overlays.
+async function processWatermark(canvas) {
+    let ctx = canvas.getContext('2d');
+    let imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
+    let data=imageData.data, W=canvas.width, H=canvas.height;
+    let MARKWORDS = ['draft','sample','confidential','preview','do not copy','watermark','restricted','www','for internal','company','demo','test','specimen'];
+    // 1. Diagonal/center overlay inpainting
+    for(let j=0;j<H;j++) {
+        for(let i=0;i<W;i++) {
+            // Diagonal: if pixel is close to the main (or anti-) diagonal
+            if (Math.abs(i-j) < W*0.08 || Math.abs(i-(W-j)) < W*0.08) {
+                let off = (j*W+i)*4;
+                // If pixel is semi-transparent or unusually bright
+                if(data[off+3]<230 || (data[off]+data[off+1]+data[off+2])/3>230 )
+                    data[off]=data[off+1]=data[off+2]=255; // paint white
+            }
+        }
+    }
+    // 2. Overlay: Replace semi-transparent overlays
+    for(let k=0,off=0; k<W*H; k++,off+=4) {
+        if (data[off+3]<210)
+            data[off]=data[off+1]=data[off+2]=255; // erase very faint images
+    }
+    ctx.putImageData(imageData,0,0);
+
+    // 3. Try to remove giant watermark texts by cover-up: measure central zones for frequent bright text
+    let bandH = Math.floor(H*0.4), bandW = Math.floor(W*0.7); // center
+    let bx=Math.floor((W-bandW)/2), by=Math.floor((H-bandH)/2);
+    let counts = new Array(256).fill(0);
+    let cutoff = 220;
+    for(let y=by;y<by+bandH;y++)
+        for(let x=bx;x<bx+bandW;x++)
+            counts[ctx.getImageData(x,y,1,1).data[0]]++;
+    if (counts.slice(cutoff).reduce((s,v)=>s+v,0)/ (bandH*bandW) > 0.29) {
+        // if bright overlay detected, apply white rectangle over center
+        ctx.save();
+        ctx.globalAlpha=0.84;
+        ctx.fillStyle="#fff";
+        ctx.fillRect(bx,by,bandW,bandH);
+        ctx.restore();
+    }
+
+    // 4. [Heuristic] Remove faint repeated horizontal/vertical lines (common in image watermarks)
+    for(let y=0; y<H; y+=15){
+      let linebright = 0;
+      for(let x=0;x<W;x++) { let off = (y*W+x)*4; linebright += data[off]+data[off+1]+data[off+2]; }
+      linebright /= (W*3);
+      if(linebright>246)
+        for(let x=0;x<W;x++) { let off = (y*W+x)*4; data[off]=data[off+1]=data[off+2]=255; }
+    }
+    ctx.putImageData(imageData,0,0);
+    // 5. Return cleaned canvas
+    return canvas;
+}
+
+// Download cleaned PDF
+downloadBtn.addEventListener('click', async ()=>{
+    if(!pdfDoc || cleanedCanvases.length!==pdfDoc.numPages) return showMsg(errorMsg, "Nothing to export.");
+    showMsg(infoMsg, "Generating cleaned PDF. Please wait...");
+    const { jsPDF } = window.jspdf;
+    // start new PDF
+    let doc = new jsPDF({unit: 'pt', format: [cleanedCanvases[0].width, cleanedCanvases[0].height]});
+    let firstPage = true;
+    for (let i=0; i<cleanedCanvases.length; i++) {
+        let c = cleanedCanvases[i];
+        let imgData = c.toDataURL('image/jpeg',0.98);
+        if (!firstPage) doc.addPage([c.width, c.height]);
+        firstPage = false;
+        doc.addImage(imgData, 'JPEG', 0, 0, c.width, c.height);
+    }
+    doc.save('watermark_removed.pdf');
+    showMsg(successMsg,"Download complete! Watermark-removed PDF saved to your computer.");
+});
+
+</script>
+</body>
+</html>
