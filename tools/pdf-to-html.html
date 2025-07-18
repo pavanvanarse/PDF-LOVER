@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free online PDF to HTML converter. Convert your PDF documents to clean, styled HTML with perfect formatting. No installation required.">
+    <meta name="keywords" content="PDF to HTML, PDF converter, HTML generator, PDF extraction">
+    <meta name="author" content="PDF Tools">
+    <title>PDF to HTML Converter | Free Online Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --light: #f8f9ff;
+            --dark: #2b2d42;
+            --success: #2ec4b6;
+            --error: #e71d36;
+            --gray: #8d99ae;
+            --border-radius: 16px;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 1024px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            font-size: 1.5rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-content {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        /* Upload area */
+        .upload-area {
+            border: 3px dashed #e0e0ff;
+            border-radius: var(--border-radius);
+            padding: 40px 20px;
+            text-align: center;
+            background: var(--light);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            height: 100%;
+        }
+
+        .upload-area.highlight {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary);
+        }
+
+        .upload-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .upload-subtext {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-info {
+            display: none;
+            background: var(--light);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 15px;
+        }
+
+        .file-info p {
+            margin: 5px 0;
+        }
+
+        .file-info span {
+            font-weight: 600;
+        }
+
+        /* Preview area */
+        #previewContent {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            height: 100%;
+            overflow: auto;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        #previewContent h1, #previewContent h2, #previewContent h3 {
+            color: var(--dark);
+            margin: 20px 0 10px;
+        }
+
+        #previewContent p {
+            margin: 10px 0;
+        }
+
+        #previewContent ul, #previewContent ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        #previewContent li {
+            margin: 8px 0;
+        }
+
+        #previewContent blockquote {
+            border-left: 4px solid var(--primary);
+            padding: 10px 20px;
+            margin: 20px 0;
+            background: var(--light);
+            font-style: italic;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-copy {
+            background: var(--success);
+        }
+
+        .btn-copy:hover {
+            background: #28a99e;
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: var(--primary);
+            width: 0%;
+            transition: var(--transition);
+        }
+
+        .progress-text {
+            text-align: center;
+            padding: 10px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin: 15px 0;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translateX(-20px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
+        .message-success {
+            background: rgba(46, 196, 182, 0.15);
+            color: #13897d;
+            border: 1px solid #2ec4b6;
+        }
+
+        .message-error {
+            background: rgba(231, 29, 54, 0.1);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            header {
+                padding: 30px 15px;
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .panel {
+                height: 500px;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            header p {
+                font-size: 1rem;
+            }
+            
+            .upload-text {
+                font-size: 1.1rem;
+            }
+            
+            .panel-header h2 {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 30px 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <header>
+            <h1>PDF to HTML Converter</h1>
+            <p>Convert your PDF documents to clean, styled HTML with perfect formatting. No installation required.</p>
+        </header>
+
+        <div class="main-content">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2><span>📁</span> Upload PDF</h2>
+                </div>
+                <div class="panel-content">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-text">Drop your PDF file here</div>
+                        <div class="upload-subtext">or click to browse files</div>
+                        <input type="file" id="fileInput" class="file-input" accept=".pdf,application/pdf" aria-label="Select PDF file">
+                    </div>
+                    
+                    <div class="file-info" id="fileInfo">
+                        <p><strong>File Name:</strong> <span id="fileName">-</span></p>
+                        <p><strong>File Size:</strong> <span id="fileSize">-</span></p>
+                        <p><strong>Status:</strong> <span id="fileStatus">Ready</span></p>
+                    </div>
+                    
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar" id="progressBar"></div>
+                        <div class="progress-text" id="progressText">Processing page 1...</div>
+                    </div>
+                    
+                    <div class="message message-error" id="errorMessage"></div>
+                    <div class="message message-success" id="successMessage"></div>
+                </div>
+                
+                <div class="actions">
+                    <button class="btn" id="convertBtn" disabled>🔁 Convert to HTML</button>
+                    <button class="btn btn-copy" id="copyBtn" disabled>📋 Copy HTML</button>
+                    <button class="btn" id="downloadBtn" disabled>💾 Download HTML</button>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <h2><span>👁️</span> HTML Preview</h2>
+                </div>
+                <div class="panel-content">
+                    <div id="previewContent">
+                        <p class="preview-placeholder">Converted HTML will appear here...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 PDF to HTML Converter | All processing occurs in your browser - your files never leave your device</p>
+        </footer>
+    </main>
+
+    <!-- Include PDF.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Set up PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM elements
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const fileStatus = document.getElementById('fileStatus');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const convertBtn = document.getElementById('convertBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const previewContent = document.getElementById('previewContent');
+            
+            let pdfDoc = null;
+            let pdfName = '';
+            let htmlContent = '';
+            
+            // Event Listeners
+            uploadArea.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFileSelect);
+            
+            // Drag and drop events
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('highlight');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('highlight');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('highlight');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+                        handleFile(file);
+                    } else {
+                        showError('Please select a PDF file');
+                    }
+                }
+            });
+            
+            convertBtn.addEventListener('click', convertPdfToHtml);
+            copyBtn.addEventListener('click', copyHtmlToClipboard);
+            downloadBtn.addEventListener('click', downloadHtmlFile);
+            
+            // File handling functions
+            function handleFileSelect(e) {
+                const file = e.target.files[0];
+                handleFile(file);
+            }
+            
+            function handleFile(file) {
+                if (!file) return;
+                
+                // Validate file type
+                if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+                    showError('Please select a PDF file');
+                    return;
+                }
+                
+                // Validate file size (max 100MB)
+                if (file.size > 100 * 1024 * 1024) {
+                    showError('File size must be less than 100MB');
+                    return;
+                }
+                
+                // Display file info
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileStatus.textContent = 'Ready to convert';
+                pdfName = file.name.replace('.pdf', '');
+                fileInfo.style.display = 'block';
+                
+                // Show the convert button
+                convertBtn.disabled = false;
+                
+                // Hide messages
+                hideMessages();
+                
+                // Read the PDF file
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const typedArray = new Uint8Array(e.target.result);
+                    loadPdf(typedArray);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+            
+            function loadPdf(data) {
+                // Load the PDF
+                pdfjsLib.getDocument({ data }).promise.then(pdf => {
+                    pdfDoc = pdf;
+                    successMessage.textContent = `PDF loaded successfully! ${pdf.numPages} pages ready for conversion.`;
+                    successMessage.style.display = 'block';
+                }).catch(err => {
+                    console.error('Error loading PDF:', err);
+                    showError('Error loading PDF. Please make sure the file is valid and not encrypted.');
+                });
+            }
+            
+            function convertPdfToHtml() {
+                if (!pdfDoc) {
+                    showError('No PDF loaded. Please upload a PDF first.');
+                    return;
+                }
+                
+                // Start conversion
+                hideMessages();
+                convertBtn.disabled = true;
+                convertBtn.innerHTML = '<span class="spinner"></span> Converting...';
+                progressContainer.style.display = 'block';
+                htmlContent = '';
+                
+                // Get all pages
+                const numPages = pdfDoc.numPages;
+                let pagesProcessed = 0;
+                
+                // Process each page
+                for (let i = 1; i <= numPages; i++) {
+                    processPage(i, numPages).then(() => {
+                        pagesProcessed++;
+                        const progress = Math.floor((pagesProcessed / numPages) * 100);
+                        progressBar.style.width = `${progress}%`;
+                        progressText.textContent = `Processing page ${pagesProcessed} of ${numPages}...`;
+                        
+                        if (pagesProcessed === numPages) {
+                            // Conversion complete
+                            progressText.textContent = 'Conversion complete!';
+                            
+                            // Display preview
+                            previewContent.innerHTML = htmlContent;
+                            previewContent.scrollTop = 0;
+                            
+                            // Enable buttons
+                            copyBtn.disabled = false;
+                            downloadBtn.disabled = false;
+                            convertBtn.disabled = false;
+                            convertBtn.innerHTML = '🔁 Convert to HTML';
+                            
+                            // Show success message
+                            setTimeout(() => {
+                                progressContainer.style.display = 'none';
+                                successMessage.textContent = `PDF converted to HTML successfully! ${numPages} pages processed.`;
+                                successMessage.style.display = 'block';
+                            }, 500);
+                        }
+                    }).catch(err => {
+                        console.error('Error processing page:', err);
+                        showError(`Error processing page ${i}: ${err.message}`);
+                        convertBtn.disabled = false;
+                        convertBtn.innerHTML = '🔁 Convert to HTML';
+                    });
+                }
+            }
+            
+            async function processPage(pageNum, totalPages) {
+                try {
+                    const page = await pdfDoc.getPage(pageNum);
+                    const textContent = await page.getTextContent();
+                    
+                    // Start building HTML for this page
+                    let pageHtml = `<div class="pdf-page" style="page-break-after: always; margin-bottom: 30px;">`;
+                    
+                    // Add page header
+                    pageHtml += `<div style="font-size: 12px; color: #777; text-align: right; margin-bottom: 10px;">
+                                Page ${pageNum} of ${totalPages}
+                            </div>`;
+                    
+                    // Process each text item
+                    for (const item of textContent.items) {
+                        // Apply styles based on font characteristics
+                        let style = '';
+                        let tag = 'p';
+                        
+                        if (item.fontName.includes('Bold')) {
+                            style += 'font-weight: bold;';
+                        }
+                        
+                        if (item.fontName.includes('Italic') || item.fontName.includes('Oblique')) {
+                            style += 'font-style: italic;';
+                        }
+                        
+                        // Determine heading levels based on font size
+                        const fontSize = item.transform[0];
+                        if (fontSize > 24) {
+                            tag = 'h1';
+                        } else if (fontSize > 20) {
+                            tag = 'h2';
+                        } else if (fontSize > 18) {
+                            tag = 'h3';
+                        } else if (fontSize > 16) {
+                            tag = 'h4';
+                        } else if (fontSize > 14) {
+                            tag = 'h5';
+                        } else if (fontSize > 12) {
+                            tag = 'h6';
+                        }
+                        
+                        // Handle line breaks
+                        if (item.hasEOL) {
+                            pageHtml += `<${tag} style="${style}margin: 8px 0;">${item.str}</${tag}>`;
+                        } else {
+                            pageHtml += `<span style="${style}">${item.str}</span>`;
+                        }
+                    }
+                    
+                    pageHtml += '</div>';
+                    htmlContent += pageHtml;
+                } catch (err) {
+                    console.error(`Error processing page ${pageNum}:`, err);
+                    throw err;
+                }
+            }
+            
+            function copyHtmlToClipboard() {
+                const htmlToCopy = `
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>${pdfName}</title>
+                        <style>
+                            body {
+                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                                line-height: 1.6;
+                                color: #333;
+                                max-width: 800px;
+                                margin: 0 auto;
+                                padding: 30px;
+                            }
+                            
+                            .pdf-page {
+                                margin-bottom: 40px;
+                                padding-bottom: 40px;
+                                border-bottom: 1px solid #eee;
+                            }
+                            
+                            h1, h2, h3, h4, h5, h6 {
+                                color: #2b2d42;
+                                margin: 20px 0 10px;
+                            }
+                            
+                            p {
+                                margin: 10px 0;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${htmlContent}
+                    </body>
+                    </html>
+                `;
+                
+                navigator.clipboard.writeText(htmlToCopy).then(() => {
+                    successMessage.textContent = 'HTML copied to clipboard!';
+                    successMessage.style.display = 'block';
+                    
+                    // Button feedback
+                    copyBtn.innerHTML = '✓ Copied!';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '📋 Copy HTML';
+                    }, 2000);
+                }).catch(err => {
+                    showError('Failed to copy HTML. Please try again.');
+                    console.error('Copy failed:', err);
+                });
+            }
+            
+            function downloadHtmlFile() {
+                const htmlContentWithDoc = `
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>${pdfName}</title>
+                        <style>
+                            body {
+                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                                line-height: 1.6;
+                                color: #333;
+                                max-width: 800px;
+                                margin: 0 auto;
+                                padding: 30px;
+                            }
+                            
+                            .pdf-page {
+                                margin-bottom: 40px;
+                                padding-bottom: 40px;
+                                border-bottom: 1px solid #eee;
+                            }
+                            
+                            h1, h2, h3, h4, h5, h6 {
+                                color: #2b2d42;
+                                margin: 20px 0 10px;
+                            }
+                            
+                            p {
+                                margin: 10px 0;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${htmlContent}
+                    </body>
+                    </html>
+                `;
+                
+                const blob = new Blob([htmlContentWithDoc], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${pdfName}.html`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                successMessage.textContent = 'HTML file downloaded!';
+                successMessage.style.display = 'block';
+            }
+            
+            // Helper functions
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                progressContainer.style.display = 'none';
+            }
+            
+            function hideMessages() {
+                errorMessage.style.display = 'none';
+                successMessage.style.display = 'none';
+            }
+        });    
+    </script>
+</body>
+</html>
