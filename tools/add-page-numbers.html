@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Page Numbers to PDF</title>
+
+    <!-- Load pdf-lib from a CDN -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    
+    <!-- Google Fonts for a modern look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- General Styling & Reset --- */
+        :root {
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --background-color: #f4f7f9;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --label-color: #555;
+            --border-color: #ddd;
+            --disabled-color: #c0c0c0;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- Main Container --- */
+        main {
+            background: var(--card-background);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        header p {
+            font-size: 1rem;
+            color: var(--label-color);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        /* --- Form & Input Styling --- */
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--label-color);
+        }
+
+        input[type="file"],
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="file"] {
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+
+        input[type="color"] {
+            width: 100%;
+            height: 48px;
+            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        /* --- Button Styling --- */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .btn-primary:disabled {
+            background-color: var(--disabled-color);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        /* --- Status and Output --- */
+        #status {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-weight: 500;
+            min-height: 24px;
+        }
+
+        #output-section {
+            margin-top: 1.5rem;
+        }
+
+        /* --- Utility Classes --- */
+        .hidden {
+            display: none;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 640px) {
+            main {
+                padding: 1.5rem;
+            }
+            header h1 {
+                font-size: 1.5rem;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <header>
+            <h1>Add Page Numbers to PDF</h1>
+            <p>Upload your PDF, customize the settings, and download your numbered file.</p>
+        </header>
+
+        <!-- Step 1: Upload -->
+        <div class="form-section">
+            <label for="pdf-upload">1. Upload PDF File</label>
+            <input type="file" id="pdf-upload" accept=".pdf" required>
+        </div>
+
+        <!-- Step 2: Customization (Initially Hidden) -->
+        <div id="customization-section" class="hidden">
+            <div class="form-section">
+                <label for="position">2. Page Number Position</label>
+                <select id="position">
+                    <option value="bottom-center" selected>Bottom Center</option>
+                    <option value="bottom-left">Bottom Left</option>
+                    <option value="bottom-right">Bottom Right</option>
+                    <option value="top-center">Top Center</option>
+                    <option value="top-left">Top Left</option>
+                    <option value="top-right">Top Right</option>
+                </select>
+            </div>
+            
+            <div class="form-section">
+                <label for="format">3. Text Format ({page} and {total})</label>
+                <input type="text" id="format" value="Page {page} of {total}">
+            </div>
+
+            <div class="form-grid">
+                <div class="form-section">
+                    <label for="font-size">4. Font Size</label>
+                    <input type="number" id="font-size" value="12" min="1">
+                </div>
+                <div class="form-section">
+                    <label for="color">5. Font Color</label>
+                    <input type="color" id="color" value="#000000">
+                </div>
+            </div>
+
+            <button id="process-btn" class="btn btn-primary" disabled>Process PDF</button>
+        </div>
+
+        <!-- Step 3: Status & Download -->
+        <div id="status" role="status" aria-live="polite"></div>
+        <div id="output-section" class="hidden">
+            <a href="#" id="download-btn" class="btn btn-success" download>Download Numbered PDF</a>
+        </div>
+
+    </main>
+
+    <script>
+        const { PDFDocument, rgb, StandardFonts } = PDFLib;
+
+        // DOM Elements
+        const pdfUpload = document.getElementById('pdf-upload');
+        const customizationSection = document.getElementById('customization-section');
+        const processBtn = document.getElementById('process-btn');
+        const statusEl = document.getElementById('status');
+        const outputSection = document.getElementById('output-section');
+        const downloadBtn = document.getElementById('download-btn');
+        
+        const positionSelect = document.getElementById('position');
+        const formatInput = document.getElementById('format');
+        const fontSizeInput = document.getElementById('font-size');
+        const colorInput = document.getElementById('color');
+
+        let uploadedFile = null;
+        let originalFileName = '';
+
+        // Event Listener for file upload
+        pdfUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file && file.type === 'application/pdf') {
+                uploadedFile = file;
+                originalFileName = file.name.replace(/\.pdf$/i, '');
+                customizationSection.classList.remove('hidden');
+                processBtn.disabled = false;
+                outputSection.classList.add('hidden');
+                statusEl.textContent = 'File ready. Adjust settings and process.';
+            } else {
+                uploadedFile = null;
+                customizationSection.classList.add('hidden');
+                processBtn.disabled = true;
+                statusEl.textContent = 'Please select a valid PDF file.';
+            }
+        });
+
+        // Event Listener for the process button
+        processBtn.addEventListener('click', async () => {
+            if (!uploadedFile) {
+                alert('Please upload a PDF file first.');
+                return;
+            }
+
+            // UI feedback
+            processBtn.disabled = true;
+            statusEl.textContent = 'Processing... This may take a moment.';
+            outputSection.classList.add('hidden');
+
+            try {
+                // Read the uploaded file as an ArrayBuffer
+                const fileReader = new FileReader();
+                fileReader.readAsArrayBuffer(uploadedFile);
+
+                fileReader.onload = async (event) => {
+                    const existingPdfBytes = event.target.result;
+
+                    // Load the PDF with pdf-lib
+                    const pdfDoc = await PDFDocument.load(existingPdfBytes);
+
+                    // Embed a standard font
+                    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+                    const pages = pdfDoc.getPages();
+                    const totalPages = pages.length;
+
+                    // Get user settings
+                    const position = positionSelect.value;
+                    const format = formatInput.value;
+                    const fontSize = parseInt(fontSizeInput.value, 10);
+                    const color = hexToRgb(colorInput.value);
+
+                    // Loop through each page
+                    for (let i = 0; i < totalPages; i++) {
+                        const page = pages[i];
+                        const { width, height } = page.getSize();
+                        
+                        const currentPage = i + 1;
+                        const text = format
+                            .replace('{page}', currentPage)
+                            .replace('{total}', totalPages);
+                        
+                        const textWidth = font.widthOfTextAtSize(text, fontSize);
+                        const textHeight = font.heightAtSize(fontSize);
+                        
+                        const margin = 30; // Margin from the edges of the page
+                        let x, y;
+
+                        // Calculate X and Y based on position
+                        switch (position) {
+                            case 'top-left':
+                                x = margin;
+                                y = height - textHeight - margin;
+                                break;
+                            case 'top-center':
+                                x = (width - textWidth) / 2;
+                                y = height - textHeight - margin;
+                                break;
+                            case 'top-right':
+                                x = width - textWidth - margin;
+                                y = height - textHeight - margin;
+                                break;
+                            case 'bottom-left':
+                                x = margin;
+                                y = margin;
+                                break;
+                            case 'bottom-right':
+                                x = width - textWidth - margin;
+                                y = margin;
+                                break;
+                            case 'bottom-center':
+                            default:
+                                x = (width - textWidth) / 2;
+                                y = margin;
+                                break;
+                        }
+
+                        // Draw the text on the page
+                        page.drawText(text, {
+                            x,
+                            y,
+                            font,
+                            size: fontSize,
+                            color: rgb(color.r, color.g, color.b),
+                        });
+                    }
+
+                    // Save the modified PDF to bytes
+                    const pdfBytes = await pdfDoc.save();
+
+                    // Create a blob and a download link
+                    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                    const downloadUrl = URL.createObjectURL(blob);
+                    
+                    downloadBtn.href = downloadUrl;
+                    downloadBtn.download = `${originalFileName}-numbered.pdf`;
+
+                    // Update UI for download
+                    statusEl.textContent = 'Processing complete!';
+                    outputSection.classList.remove('hidden');
+                    processBtn.disabled = false; // Re-enable for another run
+                };
+            } catch (error) {
+                console.error('Error processing PDF:', error);
+                alert('An error occurred while processing the PDF. Please check the console for details.');
+                statusEl.textContent = 'An error occurred. Please try again.';
+                processBtn.disabled = false;
+            }
+        });
+
+        // Helper function to convert hex color string to an RGB object for pdf-lib
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16) / 255,
+                g: parseInt(result[2], 16) / 255,
+                b: parseInt(result[3], 16) / 255,
+            } : { r: 0, g: 0, b: 0 };
+        }
+    </script>
+</body>
+</html>
