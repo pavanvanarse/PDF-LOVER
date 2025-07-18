@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encrypt PDF – Secure Your Files Online</title>
+    <meta name="description" content="Encrypt your PDF files with a password directly in your browser. No upload, 100% secure, free, and private.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --light: #f8f9ff;
+            --dark: #2b2d42;
+            --gray: #8d99ae;
+            --white: #ffffff;
+            --border-radius: 16px;
+            --border-radius-sm: 8px;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.18);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .upload-area {
+            border: 3px dashed var(--primary);
+            border-radius: var(--border-radius);
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            background: var(--light);
+            transition: var(--transition);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            transition: var(--transition);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .upload-area:hover::before,
+        .upload-area.dragover::before {
+            width: 500px;
+            height: 500px;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: var(--secondary);
+            background: #f0f2ff;
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .upload-text {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .upload-subtext {
+            color: var(--gray);
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .password-section {
+            display: none;
+            background: var(--white);
+            padding: 30px;
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid #e1e5e9;
+        }
+
+        .password-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .password-section h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: var(--border-radius-sm);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--white);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .password-strength {
+            margin-top: 8px;
+            height: 4px;
+            background: #e1e5e9;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .password-strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: var(--transition);
+            border-radius: 2px;
+        }
+
+        .password-strength.weak .password-strength-fill {
+            width: 33%;
+            background: #dc3545;
+        }
+
+        .password-strength.medium .password-strength-fill {
+            width: 66%;
+            background: #ffc107;
+        }
+
+        .password-strength.strong .password-strength-fill {
+            width: 100%;
+            background: #2ec4b6;
+        }
+
+        .password-hint {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .encrypt-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            margin-top: 10px;
+        }
+
+        .encrypt-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .encrypt-btn:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .progress-container {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e1e5e9;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .message {
+            padding: 15px 20px;
+            border-radius: var(--border-radius-sm);
+            margin: 15px 0;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .message-success {
+            background: rgba(46, 196, 182, 0.15);
+            border: 1px solid #2ec4b6;
+            color: #13897d;
+        }
+
+        .message-error {
+            background: rgba(231, 29, 54, 0.1);
+            border: 1px solid #f07c9d;
+            color: #c32649;
+        }
+
+        .secure-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .feature {
+            background: var(--light);
+            border-radius: var(--border-radius-sm);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .feature-desc {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--gray);
+            border-top: 1px solid #eee;
+            background: var(--light);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 600px;
+            }
+            
+            .main-content {
+                padding: 30px;
+            }
+            
+            header {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .upload-area {
+                padding: 40px 15px;
+            }
+            
+            .upload-icon {
+                font-size: 3rem;
+            }
+            
+            .secure-features {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.7rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .upload-text {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="font-size: 3.5rem; margin-bottom: 20px;">🔒</div>
+            <h1>Encrypt PDF</h1>
+            <p class="subtitle">Secure your PDF files with password protection</p>
+        </header>
+
+        <main class="main-content">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">Drop your PDF here</div>
+                <div class="upload-subtext">or click to select a file</div>
+                <input type="file" id="fileInput" class="file-input" accept=".pdf,application/pdf" aria-label="Upload PDF file">
+            </div>
+
+            <div class="message message-error" id="errorMessage" role="alert"></div>
+            <div class="message message-success" id="successMessage" role="alert"></div>
+
+            <div class="password-section" id="passwordSection">
+                <h3><span>🔐</span> PDF Encryption</h3>
+                
+                <div class="form-group">
+                    <label for="password">Set Password</label>
+                    <input type="password" id="password" placeholder="Enter a strong password" aria-describedby="passwordHint" autocomplete="off">
+                    <div class="password-strength" id="passwordStrength">
+                        <div class="password-strength-fill"></div>
+                    </div>
+                    <div class="password-hint" id="passwordHint">
+                        Use at least 8 characters with a mix of letters, numbers, and symbols
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Re-enter your password" autocomplete="off">
+                </div>
+
+                <button class="encrypt-btn" id="encryptBtn" disabled>
+                    <span class="spinner" id="spinner"></span>
+                    <span id="btnText">Encrypt & Download PDF</span>
+                </button>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Processing...</div>
+            </div>
+
+            <div class="secure-features">
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <div class="feature-title">Client-Side Encryption</div>
+                    <div class="feature-desc">Your files never leave your browser</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🚫</div>
+                    <div class="feature-title">No Upload</div>
+                    <div class="feature-desc">Files never touch a server</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">💯</div>
+                    <div class="feature-title">Free & Private</div>
+                    <div class="feature-desc">No registration required</div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2023 PDF Encryption Tool | 100% Secure Client-Side Processing</p>
+        </footer>
+    </div>
+
+    <!-- PDF-lib for client-side PDF encryption -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script>
+        class PDFEncryptor {
+            constructor() {
+                this.selectedFile = null;
+                this.pdfBytes = null;
+                
+                // Initialize elements
+                this.uploadArea = document.getElementById('uploadArea');
+                this.fileInput = document.getElementById('fileInput');
+                this.passwordInput = document.getElementById('password');
+                this.confirmPasswordInput = document.getElementById('confirmPassword');
+                this.passwordSection = document.getElementById('passwordSection');
+                this.encryptBtn = document.getElementById('encryptBtn');
+                this.btnText = document.getElementById('btnText');
+                this.spinner = document.getElementById('spinner');
+                this.passwordStrength = document.getElementById('passwordStrength');
+                this.passwordHint = document.getElementById('passwordHint');
+                this.progressContainer = document.getElementById('progressContainer');
+                this.progressFill = document.getElementById('progressFill');
+                this.progressText = document.getElementById('progressText');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.successMessage = document.getElementById('successMessage');
+                
+                // Set up event listeners
+                this.setupEventListeners();
+                
+                // Hide spinner initially
+                this.spinner.style.display = 'none';
+            }
+
+            setupEventListeners() {
+                // Upload area events
+                this.uploadArea.addEventListener('click', () => this.fileInput.click());
+                this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+                
+                // Drag and drop events
+                this.uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
+                this.uploadArea.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+                this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
+                
+                // Password validation
+                this.passwordInput.addEventListener('input', () => this.validatePassword());
+                this.confirmPasswordInput.addEventListener('input', () => this.validatePasswordsMatch());
+                
+                // Encrypt button
+                this.encryptBtn.addEventListener('click', () => this.encryptPDF());
+            }
+
+            handleDragOver(e) {
+                e.preventDefault();
+                this.uploadArea.classList.add('dragover');
+            }
+
+            handleDragLeave(e) {
+                e.preventDefault();
+                this.uploadArea.classList.remove('dragover');
+            }
+
+            handleDrop(e) {
+                e.preventDefault();
+                this.uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    this.handleFile(files[0]);
+                }
+            }
+
+            handleFileSelect(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    this.handleFile(file);
+                }
+            }
+
+            handleFile(file) {
+                this.hideMessages();
+                
+                // Check if file is a PDF
+                if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+                    this.showError('Please select a PDF file.');
+                    return;
+                }
+                
+                // Check file size (max 50MB)
+                if (file.size > 50 * 1024 * 1024) {
+                    this.showError('File size must be less than 50MB.');
+                    return;
+                }
+                
+                this.selectedFile = file;
+                this.passwordSection.classList.add('show');
+                this.errorMessage.style.display = 'none';
+            }
+
+            validatePassword() {
+                const password = this.passwordInput.value;
+                this.updatePasswordStrength(password);
+                this.validatePasswordsMatch();
+            }
+
+            updatePasswordStrength(password) {
+                // Reset classes
+                this.passwordStrength.className = 'password-strength';
+                
+                if (password.length === 0) {
+                    this.passwordHint.textContent = 'Use at least 8 characters with a mix of letters, numbers, and symbols';
+                    this.passwordHint.style.color = '#8d99ae';
+                    return;
+                }
+                
+                // Calculate password strength
+                let strength = 0;
+                
+                // Length check
+                if (password.length >= 8) strength += 25;
+                if (password.length >= 12) strength += 15;
+                
+                // Character variety
+                if (/[a-z]/.test(password)) strength += 10;
+                if (/[A-Z]/.test(password)) strength += 10;
+                if (/[0-9]/.test(password)) strength += 20;
+                if (/[^a-zA-Z0-9]/.test(password)) strength += 20;
+                
+                // Update strength indicator
+                if (strength < 50) {
+                    this.passwordStrength.classList.add('weak');
+                    this.passwordHint.textContent = 'Weak password. Add more characters, numbers, and symbols.';
+                    this.passwordHint.style.color = '#dc3545';
+                } else if (strength < 75) {
+                    this.passwordStrength.classList.add('medium');
+                    this.passwordHint.textContent = 'Medium strength. Consider adding more variety.';
+                    this.passwordHint.style.color = '#ffc107';
+                } else {
+                    this.passwordStrength.classList.add('strong');
+                    this.passwordHint.textContent = 'Strong password! Your PDF will be well protected.';
+                    this.passwordHint.style.color = '#2ec4b6';
+                }
+            }
+
+            validatePasswordsMatch() {
+                const password = this.passwordInput.value;
+                const confirmPassword = this.confirmPasswordInput.value;
+                
+                // Enable button only if passwords match and meet requirements
+                this.encryptBtn.disabled = !(
+                    password.length >= 8 && 
+                    password === confirmPassword
+                );
+                
+                // Update UI based on password match
+                if (confirmPassword.length > 0) {
+                    if (password === confirmPassword) {
+                        this.confirmPasswordInput.style.borderColor = '#2ec4b6';
+                    } else {
+                        this.confirmPasswordInput.style.borderColor = '#dc3545';
+                    }
+                } else {
+                    this.confirmPasswordInput.style.borderColor = '#e1e5e9';
+                }
+            }
+
+            async encryptPDF() {
+                // Validate input
+                const password = this.passwordInput.value;
+                const confirmPassword = this.confirmPasswordInput.value;
+                
+                if (password.length < 8) {
+                    this.showError('Password must be at least 8 characters long.');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    this.showError('Passwords do not match. Please re-enter.');
+                    return;
+                }
+                
+                if (!this.selectedFile) {
+                    this.showError('Please select a PDF file first.');
+                    return;
+                }
+                
+                // Show loading state
+                this.showLoading(true);
+                
+                try {
+                    this.showProgress(30, 'Reading PDF file...');
+                    
+                    // Read the file
+                    const arrayBuffer = await this.selectedFile.arrayBuffer();
+                    
+                    this.showProgress(50, 'Encrypting PDF...');
+                    
+                    // Load PDF with pdf-lib
+                    const { PDFDocument } = PDFLib;
+                    const pdfDoc = await PDFDocument.load(arrayBuffer);
+                    
+                    this.showProgress(80, 'Applying encryption...');
+                    
+                    // Encrypt with password
+                    await pdfDoc.encrypt({
+                        password: password,
+                        ownerPassword: password + '_owner', // Different owner password for security
+                        permissions: {
+                            printing: 'lowResolution',
+                            copying: false,
+                            modifying: false,
+                            annotating: false,
+                            fillingForms: false,
+                            contentAccessibility: false,
+                            documentAssembly: false
+                        }
+                    });
+                    
+                    this.showProgress(95, 'Saving encrypted PDF...');
+                    
+                    // Save the encrypted PDF
+                    const encryptedPdfBytes = await pdfDoc.save();
+                    
+                    // Create download link
+                    this.downloadEncryptedPDF(encryptedPdfBytes);
+                    
+                    this.showProgress(100, 'Encryption complete!');
+                    
+                    // Show success message
+                    setTimeout(() => {
+                        this.progressContainer.style.display = 'none';
+                        this.showSuccess('PDF encrypted successfully! File has been downloaded.');
+                        this.showLoading(false);
+                    }, 1000);
+                    
+                } catch (error) {
+                    console.error('Encryption error:', error);
+                    this.showLoading(false);
+                    this.progressContainer.style.display = 'none';
+                    this.showError('Error encrypting PDF. Please try again or use a different file.');
+                }
+            }
+
+            downloadEncryptedPDF(encryptedPdfBytes) {
+                try {
+                    // Create a Blob with the encrypted PDF
+                    const blob = new Blob([encryptedPdfBytes], { type: 'application/pdf' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    // Create download link
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = this.selectedFile.name.replace('.pdf', '_encrypted.pdf') || 'encrypted.pdf';
+                    
+                    // Trigger download
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    
+                    // Clean up
+                    URL.revokeObjectURL(url);
+                    
+                } catch (error) {
+                    console.error('Download error:', error);
+                    this.showError('Error downloading encrypted PDF.');
+                }
+            }
+
+            showProgress(percent, text) {
+                this.progressContainer.style.display = 'block';
+                this.progressFill.style.width = percent + '%';
+                this.progressText.textContent = text;
+            }
+
+            showLoading(isLoading) {
+                if (isLoading) {
+                    this.encryptBtn.disabled = true;
+                    this.spinner.style.display = 'block';
+                    this.btnText.textContent = 'Encrypting...';
+                } else {
+                    this.encryptBtn.disabled = false;
+                    this.spinner.style.display = 'none';
+                    this.btnText.textContent = 'Encrypt & Download PDF';
+                }
+            }
+
+            showError(message) {
+                this.hideMessages();
+                this.errorMessage.textContent = message;
+                this.errorMessage.style.display = 'block';
+                this.errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            showSuccess(message) {
+                this.hideMessages();
+                this.successMessage.textContent = message;
+                this.successMessage.style.display = 'block';
+                this.successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    this.successMessage.style.display = 'none';
+                }, 5000);
+            }
+
+            hideMessages() {
+                this.errorMessage.style.display = 'none';
+                this.successMessage.style.display = 'none';
+            }
+        }
+
+        // Initialize the PDF encryptor when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new PDFEncryptor();
+        });
+    </script>
+</body>
+</html>
