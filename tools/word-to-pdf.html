@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word to PDF Converter</title>
+
+    <!-- Libraries from CDN -->
+    <!-- Mammoth.js for reading .docx files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.5.1/mammoth.browser.min.js"></script>
+    <!-- html2canvas for capturing HTML as an image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF for creating PDF documents -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Google Fonts for a modern look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #d83b01; /* A "Word-like" orange */
+            --primary-hover: #b33101;
+            --success-color: #107c10;
+            --background-color: #f1f3f4;
+            --card-background: #ffffff;
+            --text-color: #202124;
+            --label-color: #5f6368;
+            --border-color: #dadce0;
+            --disabled-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- General Setup --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            background-color: var(--card-background);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1rem;
+            color: var(--label-color);
+            margin-bottom: 2.5rem;
+        }
+
+        /* --- File Upload Area --- */
+        .upload-area {
+            border: 3px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: border-color 0.3s, background-color 0.3s;
+            cursor: pointer;
+        }
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary-color);
+            background-color: #f8f9fa;
+        }
+        .upload-area input[type="file"] {
+            display: none;
+        }
+        .upload-area label {
+            font-weight: 500;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        .upload-area #file-name {
+            margin-top: 1rem;
+            font-weight: 500;
+            color: var(--label-color);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+        }
+        .btn-primary:disabled {
+            background-color: var(--disabled-color);
+            color: #9e9e9e;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        /* --- Preview and Status --- */
+        #status-area, #preview-area {
+            margin-top: 1.5rem;
+        }
+        #status-area {
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'Menlo', 'monospace';
+            font-size: 0.9rem;
+            max-height: 150px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        #preview-area {
+            border: 1px solid var(--border-color);
+            max-height: 500px;
+            overflow-y: auto;
+            background-color: #e8e8e8;
+        }
+        /* Style the preview to look like a document page */
+        #preview-content {
+            background-color: white;
+            padding: 2cm; /* A4-like margins */
+            width: 21cm; /* A4 width */
+            min-height: 29.7cm; /* A4 height */
+            margin: 1rem auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.15);
+            /* Reset styles that might conflict */
+            text-align: left;
+            color: black;
+        }
+
+        #download-area {
+            margin-top: 1.5rem;
+        }
+        .hidden { display: none; }
+        
+        /* --- Responsive Design --- */
+        @media (max-width: 920px) {
+            #preview-content {
+                width: 100%;
+                min-height: 0;
+                height: auto;
+                padding: 1.5rem;
+                margin: 0;
+                box-shadow: none;
+            }
+            #preview-area {
+                max-height: 400px;
+            }
+        }
+        @media (max-width: 600px) {
+            .container { padding: 1.5rem; }
+            header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Word to PDF Converter</h1>
+            <p>Convert your .DOCX files into a PDF, right in your browser.</p>
+        </header>
+
+        <main>
+            <div id="upload-area" class="upload-area">
+                <input type="file" id="doc-upload" accept=".docx" aria-label="Upload .docx file">
+                <label for="doc-upload">Click to choose a file or drag it here</label>
+                <p id="file-name">No file selected</p>
+            </div>
+
+            <button id="convert-btn" class="btn btn-primary" disabled>Convert to PDF</button>
+            
+            <div id="status-area" class="hidden" role="status" aria-live="polite"></div>
+            
+            <div id="preview-area" class="hidden">
+                <div id="preview-content"></div>
+            </div>
+
+            <div id="download-area" class="hidden">
+                <a href="#" id="download-link" class="btn btn-success" download>Download PDF File</a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        'use strict';
+        
+        // Expose jsPDF from its weird UMD module structure
+        const { jsPDF } = window.jspdf;
+
+        // DOM Elements
+        const uploadArea = document.getElementById('upload-area');
+        const docUpload = document.getElementById('doc-upload');
+        const fileNameDisplay = document.getElementById('file-name');
+        const convertBtn = document.getElementById('convert-btn');
+        const statusArea = document.getElementById('status-area');
+        const previewArea = document.getElementById('preview-area');
+        const previewContent = document.getElementById('preview-content');
+        const downloadArea = document.getElementById('download-area');
+        const downloadLink = document.getElementById('download-link');
+
+        let selectedFile = null;
+        let originalFileName = '';
+
+        // --- Event Listeners for File Input ---
+        uploadArea.addEventListener('click', () => docUpload.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        docUpload.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            // Check for the .docx extension
+            if (file && file.name.endsWith('.docx')) {
+                selectedFile = file;
+                originalFileName = file.name.replace(/\.docx$/i, '');
+                fileNameDisplay.textContent = file.name;
+                convertBtn.disabled = false;
+                // Reset UI
+                statusArea.classList.add('hidden');
+                previewArea.classList.add('hidden');
+                downloadArea.classList.add('hidden');
+            } else {
+                alert('Please select a valid .docx file.');
+                selectedFile = null;
+                fileNameDisplay.textContent = 'No file selected';
+                convertBtn.disabled = true;
+            }
+        }
+
+        // --- Main Conversion Logic ---
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            // UI update for processing
+            convertBtn.disabled = true;
+            statusArea.classList.remove('hidden');
+            statusArea.textContent = '';
+            previewArea.classList.add('hidden');
+            downloadArea.classList.add('hidden');
+            logStatus('Starting conversion...');
+
+            try {
+                // 1. Read the DOCX file
+                const arrayBuffer = await selectedFile.arrayBuffer();
+                logStatus('DOCX file read. Converting to HTML...');
+
+                // 2. Convert DOCX to HTML using Mammoth.js
+                const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+                previewContent.innerHTML = result.value;
+                previewArea.classList.remove('hidden');
+                logStatus('HTML preview generated.');
+                
+                if (result.messages.length > 0) {
+                    result.messages.forEach(msg => logStatus(`Mammoth message: ${msg.type} - ${msg.message}`));
+                }
+
+                // 3. Convert the HTML preview to a PDF
+                logStatus('Generating PDF from preview...');
+                generatePdf();
+
+            } catch (error) {
+                console.error('Error during conversion:', error);
+                logStatus(`An error occurred: ${error.message}`);
+                convertBtn.disabled = false; // Re-enable button on error
+            }
+        });
+
+        function generatePdf() {
+            // Use html2canvas to capture the preview content
+            html2canvas(previewContent, {
+                scale: 2, // Higher scale for better quality
+                useCORS: true, // For any images loaded from other domains
+                logging: false,
+            }).then(canvas => {
+                logStatus('Canvas snapshot created. Assembling PDF...');
+                
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                
+                const canvasWidth = canvas.width;
+                const canvasHeight = canvas.height;
+                
+                // Calculate the height of the image in the PDF to maintain aspect ratio
+                const ratio = canvasWidth / canvasHeight;
+                const imgHeight = pdfWidth / ratio;
+                
+                let heightLeft = imgHeight;
+                let position = 0;
+
+                // Add the first page
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdfHeight;
+
+                // Add new pages if content overflows
+                while (heightLeft > 0) {
+                    position = -heightLeft;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                    heightLeft -= pdfHeight;
+                }
+
+                logStatus('PDF assembled successfully!');
+                
+                // 4. Create a download link for the generated PDF
+                const pdfBlob = pdf.output('blob');
+                downloadLink.href = URL.createObjectURL(pdfBlob);
+                downloadLink.download = `${originalFileName}.pdf`;
+                
+                downloadArea.classList.remove('hidden');
+                convertBtn.disabled = false; // Re-enable the button
+
+            }).catch(err => {
+                console.error("html2canvas error:", err);
+                logStatus("Error during PDF generation.");
+                convertBtn.disabled = false;
+            });
+        }
+        
+        function logStatus(message) {
+            console.log(message);
+            statusArea.innerHTML += message + '\n';
+            // Auto-scroll to the latest message
+            statusArea.scrollTop = statusArea.scrollHeight;
+        }
+
+    </script>
+</body>
+</html>
