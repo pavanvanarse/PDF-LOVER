@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>PDF Editor – Free Online Tool to Edit, Annotate, and Sign PDFs</title>
+    <meta name="description" content="A powerful, free, and browser-based PDF Editor. Annotate, highlight text, draw, add shapes, insert text boxes, and sign PDFs directly. No uploads, 100% private.">
+
+    <!-- Libraries from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --primary-hover: #357ABD;
+            --secondary-color: #50E3C2;
+            --background-color: #f4f7f9;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --label-color: #555;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- General Setup --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        /* --- Main Layout --- */
+        .app-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            height: 100vh;
+        }
+
+        /* --- Toolbar --- */
+        .toolbar {
+            background-color: var(--card-background);
+            box-shadow: 2px 0 10px var(--shadow-color);
+            padding: 1.5rem;
+            overflow-y: auto;
+            z-index: 10;
+        }
+        .toolbar-header { text-align: center; margin-bottom: 2rem; }
+        .toolbar-header h1 { font-size: 1.5rem; color: var(--primary-color); }
+        .toolbar-section { margin-bottom: 2rem; }
+        .toolbar-section h3 { font-size: 1rem; font-weight: 500; color: var(--label-color); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        .tool-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+        
+        .tool-btn {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #f9f9f9; border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 0.75rem 0.5rem; cursor: pointer; transition: all 0.2s ease;
+        }
+        .tool-btn:hover { background: #eef; border-color: var(--primary-color); }
+        .tool-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .tool-btn svg { width: 24px; height: 24px; margin-bottom: 0.25rem; }
+        .tool-btn span { font-size: 0.75rem; font-weight: 500; }
+
+        /* Tool Properties */
+        .tool-props { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: center; }
+        .tool-props label { font-size: 0.8rem; font-weight: 500; }
+        .tool-props input[type="color"], .tool-props input[type="number"] {
+            width: 100%; border: 1px solid var(--border-color); border-radius: 5px; padding: 5px;
+        }
+        input[type="color"] { height: 35px; }
+        
+        /* --- Action Buttons --- */
+        .action-btn {
+            width: 100%; padding: 0.8rem; border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1rem;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .action-btn:hover { transform: translateY(-2px); }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-success { background-color: var(--secondary-color); color: white; }
+
+        /* --- Editor Area --- */
+        .editor-area {
+            background-color: var(--background-color);
+            overflow-y: auto;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+        #viewer-container { max-width: 850px; width: 100%; }
+        .page-container {
+            position: relative;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px var(--shadow-color);
+        }
+        .page-container canvas {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+        .render-canvas { z-index: 1; }
+        .overlay-canvas { z-index: 2; cursor: crosshair; }
+
+        /* --- Initial Upload Screen --- */
+        #upload-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
+            z-index: 100; backdrop-filter: blur(5px);
+        }
+        .upload-box {
+            background: white; padding: 3rem; border-radius: 12px; text-align: center;
+            border: 3px dashed var(--border-color); transition: all 0.3s ease;
+        }
+        .upload-box.dragover { border-color: var(--primary-color); transform: scale(1.05); }
+
+        /* --- Modal for Signature --- */
+        .modal {
+            position: fixed; z-index: 1001; /* Above upload overlay */
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); display: none;
+            justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: white; padding: 1.5rem; border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        #signature-canvas { border: 1px solid var(--border-color); border-radius: 8px; }
+        .modal-actions { display: flex; gap: 1rem; margin-top: 1rem; }
+        
+        .hidden { display: none; }
+        
+        /* --- Responsive Design --- */
+        @media (max-width: 1024px) {
+            .app-container { grid-template-columns: 1fr; height: auto; }
+            .toolbar { position: sticky; top: 0; z-index: 10; }
+            .editor-area { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="upload-overlay">
+        <div class="upload-box">
+            <h1>PDF Editor</h1>
+            <p>Drag & drop your PDF file here or</p>
+            <input type="file" id="pdf-upload" accept=".pdf" class="hidden">
+            <button class="action-btn btn-primary" onclick="document.getElementById('pdf-upload').click()">Choose File</button>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Toolbar -->
+        <aside class="toolbar">
+            <div class="toolbar-header">
+                <h1>Editor</h1>
+            </div>
+            
+            <div class="toolbar-section">
+                <h3>Tools</h3>
+                <div class="tool-grid" id="tool-selector">
+                    <button class="tool-btn active" data-tool="select">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M13.6,12.586L9.5,16.686L8.086,15.272L12.186,11.172L9.5,8.485L10.914,7.071L13.6,9.758L16.286,7.071L17.7,8.485L15.014,11.172L19.114,15.272L17.7,16.686L13.6,12.586Z"/></svg>
+                        <span>Select</span>
+                    </button>
+                    <button class="tool-btn" data-tool="draw">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.5,1.15C18.24,1.15 18,1.25 17.82,1.43L16.35,2.9L19.1,5.65L20.57,4.18C20.96,3.79 20.96,3.16 20.57,2.77L19.23,1.43C19.05,1.25 18.77,1.15 18.5,1.15M15.3,3.95L4,15.25V18H6.75L18.05,6.7L15.3,3.95Z"/></svg>
+                        <span>Draw</span>
+                    </button>
+                    <button class="tool-btn" data-tool="text">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M9.6,14L12,7.7L14.4,14M11,5L5.5,19H7.7L8.8,16H15.2L16.3,19H18.5L13,5H11Z"/></svg>
+                        <span>Text</span>
+                    </button>
+                    <button class="tool-btn" data-tool="rect">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4,4H20V20H4V4M6,6V18H18V6H6Z"/></svg>
+                        <span>Rectangle</span>
+                    </button>
+                     <button class="tool-btn" data-tool="highlight">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19.88,8.06L14.31,2.5C14.09,2.27 13.8,2.15 13.5,2.15H6C4.9,2.15 4,3.05 4,4.15V20.15C4,21.25 4.9,22.15 6,22.15H18C19.1,22.15 20,21.25 20,20.15V9.65C20,9.35 19.88,9.06 19.66,8.84M18,20.15H6V4.15H13V9.15H18V20.15Z"/></svg>
+                        <span>Highlight</span>
+                    </button>
+                    <button class="tool-btn" data-tool="sign">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M13,2C13,2 19,2 19,8C19,11.18 16.5,13.68 12.81,14.81L13.84,13.78C15.54,12.93 17,10.68 17,8C17,4 15.42,4 15.42,4C15.42,4 15,2 13,2M2,18.45L4.8,21.25C5,21.5 5.3,21.5 5.5,21.25L13.06,13.69L11.31,11.94L3.75,19.5C3.5,19.7 3.5,20.06 3.75,20.25L5.56,22L2,18.45Z"/></svg>
+                        <span>Sign</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="toolbar-section">
+                <h3>Properties</h3>
+                <div class="tool-props">
+                    <label for="stroke-color">Color</label>
+                    <input type="color" id="stroke-color" value="#FF0000">
+                    <label for="line-width">Line/Font Size</label>
+                    <input type="number" id="line-width" value="5" min="1" max="100">
+                </div>
+            </div>
+
+            <div class="toolbar-section">
+                <h3>Actions</h3>
+                <button id="download-btn" class="action-btn btn-success" disabled>Download PDF</button>
+            </div>
+        </aside>
+
+        <!-- Editor -->
+        <main class="editor-area">
+            <div id="viewer-container"></div>
+        </main>
+    </div>
+
+    <!-- Signature Modal -->
+    <div id="signature-modal" class="modal">
+        <div class="modal-content">
+            <h3>Draw your signature</h3>
+            <canvas id="signature-canvas" width="400" height="200"></canvas>
+            <div class="modal-actions">
+                <button id="clear-signature-btn" class="action-btn btn-primary">Clear</button>
+                <button id="save-signature-btn" class="action-btn btn-success">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+        
+        // Setup PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
+        const { PDFDocument, rgb, StandardFonts } = PDFLib;
+
+        // DOM Elements
+        const uploadOverlay = document.getElementById('upload-overlay');
+        const uploadBox = document.querySelector('.upload-box');
+        const pdfUpload = document.getElementById('pdf-upload');
+        const viewerContainer = document.getElementById('viewer-container');
+        const toolSelector = document.getElementById('tool-selector');
+        const strokeColorInput = document.getElementById('stroke-color');
+        const lineWidthInput = document.getElementById('line-width');
+        const downloadBtn = document.getElementById('download-btn');
+        const signatureModal = document.getElementById('signature-modal');
+        const signatureCanvas = document.getElementById('signature-canvas');
+        const clearSignatureBtn = document.getElementById('clear-signature-btn');
+        const saveSignatureBtn = document.getElementById('save-signature-btn');
+        const sigCtx = signatureCanvas.getContext('2d');
+        
+        // State
+        let pdfDoc = null;
+        let originalPdfBytes = null;
+        let activeTool = 'select';
+        let edits = []; // { type, page, ...props }
+        let signatureDataUrl = null;
+
+        // --- File Upload ---
+        pdfUpload.addEventListener('change', (e) => handleFileUpload(e.target.files[0]));
+        uploadBox.addEventListener('dragover', (e) => { e.preventDefault(); uploadBox.classList.add('dragover'); });
+        uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('dragover'));
+        uploadBox.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadBox.classList.remove('dragover');
+            handleFileUpload(e.dataTransfer.files[0]);
+        });
+        
+        async function handleFileUpload(file) {
+            if (!file || file.type !== 'application/pdf') {
+                alert('Please upload a valid PDF file.');
+                return;
+            }
+            originalPdfBytes = await file.arrayBuffer();
+            uploadOverlay.classList.add('hidden');
+            loadPdf(originalPdfBytes);
+        }
+
+        // --- PDF Loading and Rendering ---
+        async function loadPdf(data) {
+            pdfDoc = await pdfjsLib.getDocument({ data }).promise;
+            viewerContainer.innerHTML = '';
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                await renderPage(i);
+            }
+            downloadBtn.disabled = false;
+        }
+
+        async function renderPage(pageNum) {
+            const page = await pdfDoc.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 1.5 });
+            
+            const pageContainer = document.createElement('div');
+            pageContainer.className = 'page-container';
+            pageContainer.style.width = `${viewport.width}px`;
+            pageContainer.style.height = `${viewport.height}px`;
+
+            const renderCanvas = document.createElement('canvas');
+            renderCanvas.className = 'render-canvas';
+            renderCanvas.width = viewport.width;
+            renderCanvas.height = viewport.height;
+            pageContainer.appendChild(renderCanvas);
+            
+            const overlayCanvas = document.createElement('canvas');
+            overlayCanvas.className = 'overlay-canvas';
+            overlayCanvas.width = viewport.width;
+            overlayCanvas.height = viewport.height;
+            overlayCanvas.dataset.pageNum = pageNum;
+            pageContainer.appendChild(overlayCanvas);
+            
+            viewerContainer.appendChild(pageContainer);
+
+            const renderContext = {
+                canvasContext: renderCanvas.getContext('2d'),
+                viewport,
+            };
+            await page.render(renderContext).promise;
+            
+            setupCanvasEvents(overlayCanvas);
+        }
+
+        // --- Toolbar ---
+        toolSelector.addEventListener('click', (e) => {
+            const btn = e.target.closest('.tool-btn');
+            if (btn) {
+                toolSelector.querySelector('.active').classList.remove('active');
+                btn.classList.add('active');
+                activeTool = btn.dataset.tool;
+                if (activeTool === 'sign' && !signatureDataUrl) {
+                    signatureModal.style.display = 'flex';
+                }
+            }
+        });
+
+        // --- Canvas Drawing and Interaction ---
+        function setupCanvasEvents(canvas) {
+            let isDrawing = false;
+            let startX, startY;
+
+            canvas.addEventListener('mousedown', (e) => {
+                if (activeTool === 'select') return;
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                startX = e.clientX - rect.left;
+                startY = e.clientY - rect.top;
+
+                if (activeTool === 'text') {
+                    createTextInput(canvas, startX, startY);
+                    isDrawing = false; // Don't draw for text, just place input
+                } else if (activeTool === 'sign' && signatureDataUrl) {
+                    addEdit('sign', canvas.dataset.pageNum, { x: startX, y: startY, dataUrl: signatureDataUrl });
+                    isDrawing = false;
+                }
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDrawing || activeTool === 'select') return;
+                const rect = canvas.getBoundingClientRect();
+                const currentX = e.clientX - rect.left;
+                const currentY = e.clientY - rect.top;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear temp drawings
+                redrawEditsOnPage(canvas.dataset.pageNum); // Redraw existing edits
+                
+                ctx.strokeStyle = strokeColorInput.value;
+                ctx.lineWidth = lineWidthInput.value;
+                ctx.fillStyle = strokeColorInput.value;
+
+                switch(activeTool) {
+                    case 'draw':
+                        ctx.lineCap = 'round';
+                        ctx.lineTo(currentX, currentY);
+                        ctx.stroke();
+                        ctx.beginPath(); // Start new path
+                        ctx.moveTo(currentX, currentY);
+                        addEdit('path', canvas.dataset.pageNum, { x: currentX, y: currentY, color: ctx.strokeStyle, width: ctx.lineWidth });
+                        break;
+                    case 'rect':
+                        ctx.strokeRect(startX, startY, currentX - startX, currentY - startY);
+                        break;
+                    case 'highlight':
+                        ctx.globalAlpha = 0.3;
+                        ctx.fillRect(startX, startY, currentX - startX, currentY - startY);
+                        ctx.globalAlpha = 1.0;
+                        break;
+                }
+            });
+            
+            canvas.addEventListener('mouseup', (e) => {
+                if (!isDrawing || activeTool === 'select' || activeTool === 'draw') {
+                    isDrawing = false;
+                    return;
+                }
+                const rect = canvas.getBoundingClientRect();
+                const endX = e.clientX - rect.left;
+                const endY = e.clientY - rect.top;
+                
+                addEdit(activeTool, canvas.dataset.pageNum, {
+                    x: Math.min(startX, endX),
+                    y: Math.min(startY, endY),
+                    width: Math.abs(endX - startX),
+                    height: Math.abs(endY - startY),
+                    color: strokeColorInput.value,
+                    lineWidth: lineWidthInput.value
+                });
+                isDrawing = false;
+            });
+        }
+        
+        function createTextInput(canvas, x, y) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.style.position = 'absolute';
+            input.style.left = `${canvas.offsetLeft + x}px`;
+            input.style.top = `${canvas.offsetTop + y}px`;
+            input.style.border = '1px solid #000';
+            input.style.font = `${lineWidthInput.value * 1.5}px sans-serif`;
+            input.style.zIndex = '100';
+            viewerContainer.appendChild(input);
+            input.focus();
+
+            input.addEventListener('blur', () => {
+                addEdit('text', canvas.dataset.pageNum, {
+                    text: input.value, x, y,
+                    size: lineWidthInput.value * 1.5,
+                    color: strokeColorInput.value
+                });
+                viewerContainer.removeChild(input);
+            }, { once: true });
+        }
+        
+        function addEdit(type, pageNum, props) {
+            edits.push({ type, pageNum: parseInt(pageNum), ...props });
+            redrawEditsOnPage(pageNum);
+        }
+        
+        function redrawEditsOnPage(pageNum) {
+            const canvas = document.querySelector(`.overlay-canvas[data-page-num="${pageNum}"]`);
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            edits.filter(e => e.pageNum == pageNum).forEach(edit => {
+                ctx.strokeStyle = edit.color;
+                ctx.lineWidth = edit.width || edit.lineWidth;
+                ctx.fillStyle = edit.color;
+                
+                switch(edit.type) {
+                    case 'path':
+                        // Re-drawing path segments is complex, so we simplify by just showing dots for now.
+                        // A full implementation would group path points into continuous lines.
+                        ctx.beginPath();
+                        ctx.arc(edit.x, edit.y, edit.width/2, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+                    case 'rect':
+                        ctx.strokeRect(edit.x, edit.y, edit.width, edit.height);
+                        break;
+                    case 'highlight':
+                        ctx.globalAlpha = 0.3;
+                        ctx.fillRect(edit.x, edit.y, edit.width, edit.height);
+                        ctx.globalAlpha = 1.0;
+                        break;
+                    case 'text':
+                        ctx.font = `${edit.size}px sans-serif`;
+                        ctx.fillText(edit.text, edit.x, edit.y + edit.size);
+                        break;
+                    case 'sign':
+                        const img = new Image();
+                        img.src = edit.dataUrl;
+                        img.onload = () => ctx.drawImage(img, edit.x - img.width/2, edit.y - img.height/2);
+                        break;
+                }
+            });
+        }
+        
+        // --- Signature Pad ---
+        let isSigning = false;
+        function clearSignature() { sigCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height); }
+        signatureCanvas.addEventListener('mousedown', () => { isSigning = true; sigCtx.beginPath(); });
+        signatureCanvas.addEventListener('mouseup', () => { isSigning = false; });
+        signatureCanvas.addEventListener('mousemove', (e) => {
+            if (!isSigning) return;
+            sigCtx.lineWidth = 3;
+            sigCtx.lineCap = 'round';
+            sigCtx.strokeStyle = '#000';
+            const rect = signatureCanvas.getBoundingClientRect();
+            sigCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            sigCtx.stroke();
+            sigCtx.beginPath();
+            sigCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        });
+        clearSignatureBtn.addEventListener('click', clearSignature);
+        saveSignatureBtn.addEventListener('click', () => {
+            signatureDataUrl = signatureCanvas.toDataURL();
+            signatureModal.style.display = 'none';
+            alert('Signature saved! Click on the PDF to place it.');
+        });
+
+        // --- PDF Export ---
+        downloadBtn.addEventListener('click', async () => {
+            const finalPdf = await PDFDocument.load(originalPdfBytes);
+            const font = await finalPdf.embedFont(StandardFonts.Helvetica);
+            
+            const pages = finalPdf.getPages();
+            
+            for(const edit of edits) {
+                const page = pages[edit.pageNum - 1];
+                const { width, height } = page.getSize();
+                const canvas = document.querySelector(`.overlay-canvas[data-page-num="${edit.pageNum}"]`);
+                const scaleX = width / canvas.width;
+                const scaleY = height / canvas.height;
+                
+                const commonProps = {
+                    x: edit.x * scaleX,
+                    y: height - (edit.y * scaleY),
+                    color: hexToRgb(edit.color),
+                    borderColor: hexToRgb(edit.color),
+                    borderWidth: (edit.lineWidth || edit.width || 1) * scaleX,
+                };
+                
+                switch(edit.type) {
+                    case 'path': // Group path points to draw lines
+                        // This is a simplified approach. A full implementation would reconstruct lines.
+                        page.drawCircle({ ...commonProps, size: commonProps.borderWidth / 2 });
+                        break;
+                    case 'rect':
+                        page.drawRectangle({ ...commonProps, width: edit.width * scaleX, height: -edit.height * scaleY });
+                        break;
+                    case 'highlight':
+                        page.drawRectangle({ ...commonProps, width: edit.width * scaleX, height: -edit.height * scaleY, opacity: 0.3 });
+                        break;
+                    case 'text':
+                        page.drawText(edit.text, { ...commonProps, size: edit.size * scaleY, y: height - (edit.y * scaleY) - (edit.size * scaleY) });
+                        break;
+                    case 'sign':
+                        const pngImage = await finalPdf.embedPng(edit.dataUrl);
+                        const pngDims = pngImage.scale(0.5); // Scale signature
+                        page.drawImage(pngImage, { x: commonProps.x - (pngDims.width/2), y: commonProps.y - (pngDims.height/2), width: pngDims.width, height: pngDims.height });
+                        break;
+                }
+            }
+            
+            const pdfBytes = await finalPdf.save();
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'edited.pdf';
+            link.click();
+        });
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16) / 255,
+                g: parseInt(result[2], 16) / 255,
+                b: parseInt(result[3], 16) / 255
+            } : { r: 0, g: 0, b: 0 };
+        }
+
+    </script>
+</body>
+</html>
