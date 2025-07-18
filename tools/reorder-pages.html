@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rearrange PDF Pages - Reorder PDF Pages Online</title>
+    <meta name="description" content="Free online PDF page rearranger. Upload your PDF and drag pages to reorder them instantly. Download your rearranged PDF.">
+    <meta name="keywords" content="PDF page reorder, rearrange PDF pages, PDF organizer, sort PDF pages">
+    <meta name="author" content="PDF Tools">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content {
+            padding: 40px 30px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .upload-area:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: linear-gradient(135deg, #f0f2ff 0%, #e8ecff 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .upload-text {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .upload-subtext {
+            color: #666;
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-info {
+            display: none;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid #e1e5e9;
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .file-info h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .file-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .file-details:last-child {
+            border-bottom: none;
+        }
+
+        .file-details span:first-child {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .file-details span:last-child {
+            color: #666;
+        }
+
+        .progress-container {
+            display: none;
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e1e5e9;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .pages-container {
+            display: none;
+            margin-bottom: 30px;
+        }
+
+        .container-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pages-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .pages-count {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .instructions {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 1px solid #2196f3;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #1976d2;
+            font-size: 0.95rem;
+        }
+
+        .instructions strong {
+            color: #0d47a1;
+        }
+
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 15px;
+            border: 2px solid #e1e5e9;
+            min-height: 300px;
+        }
+
+        .page-thumbnail {
+            position: relative;
+            width: 100%;
+            height: 240px;
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            cursor: move;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-thumbnail:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .page-thumbnail.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+            z-index: 1000;
+        }
+
+        .page-thumbnail.drag-over {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+        }
+
+        .page-canvas {
+            flex: 1;
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            background: #fafafa;
+        }
+
+        .page-info {
+            padding: 10px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+            border-top: 1px solid #e1e5e9;
+            text-align: center;
+        }
+
+        .page-number {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 2px;
+        }
+
+        .page-size {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .drag-placeholder {
+            border: 2px dashed #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-weight: 500;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn:disabled::before {
+            display: none;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+            display: none;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            header {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .main-content {
+                padding: 30px 20px;
+            }
+
+            .upload-area {
+                padding: 30px 15px;
+            }
+
+            .pages-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .page-thumbnail {
+                height: 200px;
+            }
+
+            .page-canvas {
+                height: 150px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .container-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .upload-area {
+                padding: 20px 10px;
+            }
+
+            .upload-icon {
+                font-size: 2.5rem;
+            }
+
+            .pages-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .page-thumbnail {
+                height: 160px;
+            }
+
+            .page-canvas {
+                height: 120px;
+            }
+
+            .file-info {
+                padding: 20px;
+            }
+
+            .file-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Sortable styles */
+        .sortable-ghost {
+            opacity: 0.4;
+        }
+
+        .sortable-chosen {
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .sortable-drag {
+            transform: rotate(5deg);
+        }
+    </style>
+
+    <!-- PDF.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Sortable.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📄 Rearrange PDF Pages</h1>
+            <p class="subtitle">Drag and drop to reorder pages in your PDF</p>
+        </header>
+
+        <main class="main-content">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📑</div>
+                <div class="upload-text">Drop your PDF here</div>
+                <div class="upload-subtext">or click to select a file</div>
+                <input type="file" id="fileInput" class="file-input" accept="application/pdf" aria-label="Upload PDF file">
+            </div>
+
+            <div class="error-message" id="errorMessage" role="alert"></div>
+            <div class="success-message" id="successMessage" role="alert"></div>
+
+            <div class="file-info" id="fileInfo">
+                <h3>📋 File Information</h3>
+                <div class="file-details">
+                    <span>Name:</span>
+                    <span id="fileName"></span>
+                </div>
+                <div class="file-details">
+                    <span>Size:</span>
+                    <span id="fileSize"></span>
+                </div>
+                <div class="file-details">
+                    <span>Pages:</span>
+                    <span id="pageCount"></span>
+                </div>
+                <div class="file-details">
+                    <span>Status:</span>
+                    <span id="fileStatus"></span>
+                </div>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Processing...</div>
+            </div>
+
+            <div class="pages-container" id="pagesContainer">
+                <div class="container-header">
+                    <h2 class="pages-title">📖 PDF Pages</h2>
+                    <div class="pages-count" id="pagesCount">0 pages</div>
+                </div>
+
+                <div class="instructions">
+                    <strong>💡 How to use:</strong> Drag and drop page thumbnails to reorder them. The page numbers will update automatically to reflect the new order.
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-secondary" id="resetBtn" disabled>
+                        🔄 Reset Order
+                    </button>
+                    <button class="btn btn-secondary" id="reverseBtn" disabled>
+                        🔀 Reverse Order
+                    </button>
+                    <button class="btn btn-success" id="downloadBtn" disabled>
+                        💾 Download Rearranged PDF
+                    </button>
+                </div>
+
+                <div class="pages-grid" id="pagesGrid"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const pageCount = document.getElementById('pageCount');
+        const fileStatus = document.getElementById('fileStatus');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const pagesContainer = document.getElementById('pagesContainer');
+        const pagesCount = document.getElementById('pagesCount');
+        const pagesGrid = document.getElementById('pagesGrid');
+        const resetBtn = document.getElementById('resetBtn');
+        const reverseBtn = document.getElementById('reverseBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Global variables
+        let selectedFile = null;
+        let pdfDocument = null;
+        let pageOrder = [];
+        let originalOrder = [];
+        let sortable = null;
+
+        // Event Listeners
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+        resetBtn.addEventListener('click', resetOrder);
+        reverseBtn.addEventListener('click', reverseOrder);
+        downloadBtn.addEventListener('click', downloadRearrangedPDF);
+
+        // File handling functions
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            hideMessages();
+            
+            // Validate file type
+            if (file.type !== 'application/pdf') {
+                showError('Please select a PDF file.');
+                return;
+            }
+
+            // Validate file size (max 100MB)
+            if (file.size > 100 * 1024 * 1024) {
+                showError('File size must be less than 100MB.');
+                return;
+            }
+
+            selectedFile = file;
+            displayFileInfo(file);
+            processPDF(file);
+        }
+
+        function displayFileInfo(file) {
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileStatus.textContent = 'Processing...';
+            fileInfo.style.display = 'block';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        async function processPDF(file) {
+            try {
+                showProgress(0, 'Loading PDF...');
+                const arrayBuffer = await file.arrayBuffer();
+                
+                showProgress(20, 'Analyzing document...');
+                pdfDocument = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                const numPages = pdfDocument.numPages;
+                pageCount.textContent = numPages;
+                pagesCount.textContent = `${numPages} pages`;
+                
+                // Initialize page order
+                pageOrder = Array.from({ length: numPages }, (_, i) => i + 1);
+                originalOrder = [...pageOrder];
+                
+                showProgress(40, 'Generating thumbnails...');
+                await generateThumbnails(pdfDocument);
+                
+                showProgress(100, 'Ready to rearrange!');
+                
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    fileStatus.textContent = 'Ready';
+                    pagesContainer.style.display = 'block';
+                    enableControls();
+                    initializeSortable();
+                    showSuccess('PDF loaded successfully! Drag and drop pages to reorder them.');
+                }, 500);
+                
+            } catch (error) {
+                console.error('PDF processing error:', error);
+                showError('Error processing PDF. Please make sure the file is not corrupted.');
+                progressContainer.style.display = 'none';
+                fileStatus.textContent = 'Error';
+            }
+        }
+
+        async function generateThumbnails(pdf) {
+            pagesGrid.innerHTML = '';
+            
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const progress = 40 + (i / pdf.numPages) * 50;
+                showProgress(progress, `Generating thumbnail ${i}/${pdf.numPages}...`);
+                
+                const page = await pdf.getPage(i);
+                const viewport = page.getViewport({ scale: 0.5 });
+                
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                await page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                }).promise;
+                
+                const thumbnailDiv = createThumbnailElement(i, canvas, viewport);
+                pagesGrid.appendChild(thumbnailDiv);
+            }
+        }
+
+        function createThumbnailElement(pageNum, canvas, viewport) {
+            const thumbnailDiv = document.createElement('div');
+            thumbnailDiv.className = 'page-thumbnail';
+            thumbnailDiv.dataset.pageNum = pageNum;
+            
+            const canvasClone = canvas.cloneNode();
+            canvasClone.className = 'page-canvas';
+            canvasClone.getContext('2d').drawImage(canvas, 0, 0);
+            
+            const pageInfo = document.createElement('div');
+            pageInfo.className = 'page-info';
+            
+            const pageNumber = document.createElement('div');
+            pageNumber.className = 'page-number';
+            pageNumber.textContent = `Page ${pageNum}`;
+            
+            const pageSize = document.createElement('div');
+            pageSize.className = 'page-size';
+            pageSize.textContent = `${Math.round(viewport.width)}×${Math.round(viewport.height)}`;
+            
+            pageInfo.appendChild(pageNumber);
+            pageInfo.appendChild(pageSize);
+            
+            thumbnailDiv.appendChild(canvasClone);
+            thumbnailDiv.appendChild(pageInfo);
+            
+            return thumbnailDiv;
+        }
+
+        function initializeSortable() {
+            if (sortable) {
+                sortable.destroy();
+            }
+            
+            sortable = Sortable.create(pagesGrid, {
+                animation: 200,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                onEnd: function(evt) {
+                    updatePageOrder();
+                    updatePageNumbers();
+                    enableControls();
+                }
+            });
+        }
+
+        function updatePageOrder() {
+            const thumbnails = pagesGrid.querySelectorAll('.page-thumbnail');
+            pageOrder = Array.from(thumbnails).map(thumb => parseInt(thumb.dataset.pageNum));
+        }
+
+        function updatePageNumbers() {
+            const thumbnails = pagesGrid.querySelectorAll('.page-thumbnail');
+            thumbnails.forEach((thumb, index) => {
+                const pageNumber = thumb.querySelector('.page-number');
+                pageNumber.textContent = `Page ${index + 1}`;
+            });
+        }
+
+        function resetOrder() {
+            pageOrder = [...originalOrder];
+            rearrangeThumbnails();
+            updatePageNumbers();
+            showSuccess('Page order has been reset to original.');
+        }
+
+        function reverseOrder() {
+            pageOrder = [...pageOrder].reverse();
+            rearrangeThumbnails();
+            updatePageNumbers();
+            showSuccess('Page order has been reversed.');
+        }
+
+        function rearrangeThumbnails() {
+            const thumbnails = Array.from(pagesGrid.querySelectorAll('.page-thumbnail'));
+            
+            // Sort thumbnails according to new order
+            const sortedThumbnails = pageOrder.map(pageNum => 
+                thumbnails.find(thumb => parseInt(thumb.dataset.pageNum) === pageNum)
+            );
+            
+            // Clear and re-append in new order
+            pagesGrid.innerHTML = '';
+            sortedThumbnails.forEach(thumb => pagesGrid.appendChild(thumb));
+        }
+
+        function enableControls() {
+            resetBtn.disabled = false;
+            reverseBtn.disabled = false;
+            downloadBtn.disabled = false;
+        }
+
+        async function downloadRearrangedPDF() {
+            if (!pdfDocument || pageOrder.length === 0) {
+                showError('No PDF loaded or pages to rearrange.');
+                return;
+            }
+
+            try {
+                showProgress(0, 'Preparing PDF...');
+                const { jsPDF } = window.jspdf;
+                const newPDF = new jsPDF();
+                
+                // Remove the default first page
+                newPDF.deletePage(1);
+                
+                for (let i = 0; i < pageOrder.length; i++) {
+                    const pageNum = pageOrder[i];
+                    const progress = (i / pageOrder.length) * 100;
+                    showProgress(progress, `Processing page ${i + 1}/${pageOrder.length}...`);
+                    
+                    const page = await pdfDocument.getPage(pageNum);
+                    const viewport = page.getViewport({ scale: 2 });
+                    
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    
+                    await page.render({
+                        canvasContext: context,
+                        viewport: viewport
+                    }).promise;
+                    
+                    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                    
+                    // Add new page
+                    newPDF.addPage([viewport.width / 2, viewport.height / 2], 'portrait');
+                    
+                    // Add image to page
+                    newPDF.addImage(imgData, 'JPEG', 0, 0, viewport.width / 2, viewport.height / 2);
+                }
+                
+                showProgress(100, 'Finalizing PDF...');
+                
+                setTimeout(() => {
+                    const fileName = selectedFile.name.replace('.pdf', '_rearranged.pdf');
+                    newPDF.save(fileName);
+                    
+                    progressContainer.style.display = 'none';
+                    showSuccess('PDF downloaded successfully! Pages have been rearranged according to your changes.');
+                }, 500);
+                
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                showError('Error generating PDF. Please try again.');
+                progressContainer.style.display = 'none';
+            }
+        }
+
+        function showProgress(percent, text) {
+            progressContainer.style.display = 'block';
+            progressFill.style.width = Math.min(percent, 100) + '%';
+            progressText.textContent = text;
+        }
+
+        function showError(message) {
+            hideMessages();
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function showSuccess(message) {
+            hideMessages();
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function hideMessages() {
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+        }
+
+        // Initialize the application
+        function init() {
+            // Reset all states
+            selectedFile = null;
+            pdfDocument = null;
+            pageOrder = [];
+            originalOrder = [];
+            
+            // Reset UI
+            pagesContainer.style.display = 'none';
+            fileInfo.style.display = 'none';
+            progressContainer.style.display = 'none';
+            
+            // Reset controls
+            resetBtn.disabled = true;
+            reverseBtn.disabled = true;
+            downloadBtn.disabled = true;
+            
+            // Clear pages grid
+            pagesGrid.innerHTML = '';
+            
+            hideMessages();
+        }
+
+        // Initialize on page load
+        init();
+    </script>
+</body>
+</html>
