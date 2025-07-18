@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>HTML to PDF Converter – Free Online Tool</title>
+    <meta name="description" content="Convert HTML or webpage content into PDF instantly. Free, fast, browser-based HTML to PDF converter with preview and export.">
+
+    <!-- Libraries from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --success-color: #16a34a;
+            --background-color: #f3f4f6;
+            --card-background: #ffffff;
+            --text-color: #1f2937;
+            --label-color: #4b5563;
+            --border-color: #d1d5db;
+            --disabled-color: #e5e7eb;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+        }
+
+        /* --- General Setup --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* --- Main Layout --- */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+        
+        .controls, .preview-section {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            padding: 1.5rem;
+        }
+
+        header h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; }
+        header p { font-size: 0.9rem; color: var(--label-color); margin-bottom: 1.5rem; }
+
+        /* --- Input Tabs --- */
+        .tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
+        .tab {
+            padding: 0.75rem 1rem; border: none; background: none; cursor: pointer;
+            font-size: 1rem; font-family: 'Poppins', sans-serif; font-weight: 500;
+            color: var(--label-color); border-bottom: 3px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .tab:hover { color: var(--primary-color); }
+        .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+        
+        .input-panel { display: none; }
+        .input-panel.active { display: block; }
+        
+        /* --- Form Elements --- */
+        label { display: block; font-weight: 500; margin-bottom: 0.5rem; }
+        textarea, input[type="url"] {
+            width: 100%; padding: 0.75rem; border: 1px solid var(--border-color);
+            border-radius: 8px; font-family: 'Menlo', 'monospace'; font-size: 0.9rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        textarea { min-height: 200px; resize: vertical; }
+        textarea:focus, input[type="url"]:focus {
+            outline: none; border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+        .url-disclaimer { font-size: 0.8rem; color: var(--label-color); margin-top: 0.5rem; }
+
+        /* --- Buttons --- */
+        .btn {
+            display: flex; align-items: center; justify-content: center; width: 100%;
+            padding: 0.8rem 1rem; border: none; border-radius: 8px; font-size: 1.1rem;
+            font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+        }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover:not(:disabled) { background-color: var(--primary-hover); }
+        .btn:disabled { background-color: var(--disabled-color); color: #9ca3af; cursor: not-allowed; }
+        .btn-success { background-color: var(--success-color); color: white; }
+        
+        /* --- Preview & Status --- */
+        #status-area {
+            margin-top: 1.5rem; padding: 1rem; background-color: #f9fafb; border: 1px solid var(--border-color);
+            border-radius: 8px; text-align: left; font-family: 'Menlo', 'monospace'; font-size: 0.9rem;
+            max-height: 150px; overflow-y: auto; white-space: pre-wrap;
+        }
+        #preview-iframe {
+            width: 100%; height: 100%; min-height: 80vh;
+            border: 1px solid var(--border-color); border-radius: 8px;
+        }
+        #download-area { margin-top: 1rem; }
+        .hidden { display: none; }
+        
+        /* --- Responsive Design --- */
+        @media (max-width: 1024px) {
+            .container { grid-template-columns: 1fr; }
+            .preview-section { margin-top: 2rem; }
+        }
+        @media (max-width: 600px) {
+            body { padding: 1rem; }
+            .controls, .preview-section { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Left Panel: Controls -->
+        <aside class="controls">
+            <header>
+                <h1>HTML to PDF Converter</h1>
+                <p>Paste code, enter a URL, or drop an HTML file to convert it to a PDF.</p>
+            </header>
+            
+            <div class="tabs">
+                <button class="tab active" data-tab="code">Paste Code</button>
+                <button class="tab" data-tab="url">From URL</button>
+            </div>
+
+            <div id="code-panel" class="input-panel active">
+                <label for="html-code">HTML Code (or drop an .html file)</label>
+                <textarea id="html-code" placeholder="<html>...</html>"></textarea>
+            </div>
+
+            <div id="url-panel" class="input-panel">
+                <label for="html-url">Webpage URL</label>
+                <input type="url" id="html-url" placeholder="https://example.com">
+                <p class="url-disclaimer">Note: A CORS proxy is used. Do not use for sensitive pages.</p>
+            </div>
+
+            <button id="convert-btn" class="btn btn-primary" style="margin-top: 1.5rem;">Convert to PDF</button>
+
+            <div id="status-area" class="hidden" role="status" aria-live="polite"></div>
+            <div id="download-area" class="hidden">
+                 <a href="#" id="download-link" class="btn btn-success" download>Download PDF</a>
+            </div>
+        </aside>
+
+        <!-- Right Panel: Preview -->
+        <main class="preview-section">
+            <iframe id="preview-iframe" title="HTML Content Preview" sandbox="allow-scripts allow-same-origin"></iframe>
+        </main>
+    </div>
+
+    <script>
+        'use strict';
+        
+        // Expose jsPDF from its UMD module structure
+        const { jsPDF } = window.jspdf;
+
+        // DOM Elements
+        const tabs = document.querySelectorAll('.tab');
+        const codePanel = document.getElementById('code-panel');
+        const urlPanel = document.getElementById('url-panel');
+        const htmlCodeTextarea = document.getElementById('html-code');
+        const htmlUrlInput = document.getElementById('html-url');
+        const convertBtn = document.getElementById('convert-btn');
+        const statusArea = document.getElementById('status-area');
+        const previewIframe = document.getElementById('preview-iframe');
+        const downloadArea = document.getElementById('download-area');
+        const downloadLink = document.getElementById('download-link');
+        
+        let activeTab = 'code';
+
+        // --- Tab Switching Logic ---
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                activeTab = tab.dataset.tab;
+
+                codePanel.classList.toggle('active', activeTab === 'code');
+                urlPanel.classList.toggle('active', activeTab === 'url');
+            });
+        });
+
+        // --- Drag and Drop for HTML File ---
+        htmlCodeTextarea.addEventListener('dragover', (e) => e.preventDefault());
+        htmlCodeTextarea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'text/html') {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    htmlCodeTextarea.value = event.target.result;
+                    logStatus('HTML file loaded.');
+                };
+                reader.readAsText(file);
+            }
+        });
+        
+        // --- Main Conversion Logic ---
+        convertBtn.addEventListener('click', async () => {
+            convertBtn.disabled = true;
+            statusArea.classList.remove('hidden');
+            downloadArea.classList.add('hidden');
+            logStatus('Starting conversion...', true);
+
+            try {
+                let htmlContent = '';
+                if (activeTab === 'code') {
+                    htmlContent = htmlCodeTextarea.value;
+                    if (!htmlContent.trim()) {
+                        throw new Error('HTML code is empty.');
+                    }
+                    logStatus('Rendering provided HTML...');
+                    renderInIframe(htmlContent);
+                } else {
+                    const url = htmlUrlInput.value;
+                    if (!url) {
+                        throw new Error('URL is empty.');
+                    }
+                    logStatus(`Fetching content from URL...`);
+                    const proxiedUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                    const response = await fetch(proxiedUrl);
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch URL: ${response.statusText}`);
+                    }
+                    htmlContent = await response.text();
+                    
+                    // IMPORTANT: Fix relative paths for assets (CSS, images)
+                    const base = new URL(url);
+                    const fixedHtml = htmlContent.replace(/(href|src)=["'](?!\/\/|http)([^"']+)["']/g, `$1="${base.origin}$2"`);
+                    
+                    logStatus('Content fetched. Rendering page...');
+                    renderInIframe(fixedHtml);
+                }
+            } catch (error) {
+                handleError(error);
+            }
+        });
+
+        function renderInIframe(html) {
+            previewIframe.srcdoc = html;
+            previewIframe.onload = () => {
+                logStatus('Content rendered. Generating PDF...');
+                generatePdfFromIframe();
+            };
+        }
+
+        async function generatePdfFromIframe() {
+            try {
+                const content = previewIframe.contentWindow.document.body;
+                if (!content) throw new Error("Could not access iframe content.");
+
+                const canvas = await html2canvas(content, {
+                    scale: 2,
+                    logging: false,
+                    useCORS: true,
+                    allowTaint: true
+                });
+
+                logStatus('Canvas created. Assembling PDF...');
+                
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({
+                    orientation: 'portrait', unit: 'mm', format: 'a4'
+                });
+
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                let heightLeft = pdfHeight;
+                let position = 0;
+                
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                heightLeft -= pdf.internal.pageSize.getHeight();
+
+                while (heightLeft > 0) {
+                    position = -heightLeft;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                    heightLeft -= pdf.internal.pageSize.getHeight();
+                }
+
+                logStatus('PDF generation complete!');
+                
+                const pdfBlob = pdf.output('blob');
+                downloadLink.href = URL.createObjectURL(pdfBlob);
+                downloadArea.classList.remove('hidden');
+                convertBtn.disabled = false;
+
+            } catch (error) {
+                handleError(error);
+            }
+        }
+
+        function logStatus(message, clear = false) {
+            console.log(message);
+            if (clear) {
+                statusArea.textContent = message;
+            } else {
+                statusArea.textContent += '\n' + message;
+            }
+            statusArea.scrollTop = statusArea.scrollHeight;
+        }
+
+        function handleError(error) {
+            console.error(error);
+            logStatus(`Error: ${error.message}`);
+            convertBtn.disabled = false;
+        }
+
+    </script>
+</body>
+</html>
